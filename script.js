@@ -94,11 +94,11 @@ function renderHomepageWithTagesanalyse(data) {
   // Nur vorhandene Slots anzeigen
   const vorhandene = slots.filter(s => s.topic);
 
-  // Fallback: mit Demo-Themen auffüllen bis mindestens 3
+  // Fallback: mit Demo-Themen auffüllen bis 5 Karten
   const demos = [
+    DEMO_DATA["eu-kunststoffverpackungen"],
     DEMO_DATA["co2-steuer"],
-    DEMO_DATA["erbschaftssteuer"],
-    DEMO_DATA["eu-kunststoffverpackungen"]
+    DEMO_DATA["erbschaftssteuer"]
   ];
 
   let index = 0;
@@ -106,10 +106,10 @@ function renderHomepageWithTagesanalyse(data) {
     grid.appendChild(createTopicCard(slot.topic, index++, slot.isToday, slot.label));
   });
 
-  // Demo-Themen auffüllen wenn weniger als 3 echte Themen
-  if (vorhandene.length < 3) {
-    demos.slice(0, 3 - vorhandene.length).forEach(function (topic) {
-      if (topic) grid.appendChild(createTopicCard(topic, index++, false));
+  // Demo-Themen auffüllen wenn weniger als 5 echte Themen
+  if (vorhandene.length < 5) {
+    demos.slice(0, 5 - vorhandene.length).forEach(function (topic) {
+      if (topic) grid.appendChild(createTopicCard(topic, index++, false, "Demo"));
     });
   }
 }
