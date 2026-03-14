@@ -118,7 +118,7 @@ function showApiStatus() {
   const hint = document.getElementById("api-status-hint");
   if (!hint) return;
   if (CONFIG.useWorker && CONFIG.workerUrl) {
-    hint.innerHTML = `<span class="api-live">● Live – Gemini API mit Search Grounding aktiv</span>`;
+    hint.innerHTML = `<span class="api-live">● Live – Gemini API aktiv</span>`;
   } else {
     hint.innerHTML = `<span class="api-demo">○ Demo-Modus – Worker noch nicht konfiguriert</span>`;
   }
