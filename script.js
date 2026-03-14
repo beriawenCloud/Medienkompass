@@ -130,8 +130,15 @@ function showApiStatus() {
 function showLoadingFull(visible) {
   const overlay = DOM.loadingOverlay();
   if (!overlay) return;
-  if (visible) overlay.classList.remove("hidden");
-  else         overlay.classList.add("hidden");
+  if (visible) {
+    overlay.classList.remove("hidden");
+    overlay.style.position = "relative";
+    overlay.style.padding  = "3rem 0";
+  } else {
+    overlay.classList.add("hidden");
+    overlay.style.position = "";
+    overlay.style.padding  = "";
+  }
 }
 
 /* ---------------------------------------------------------
@@ -840,6 +847,9 @@ function showLoading(visible) {
       const btnText = searchBtn.querySelector(".btn-text");
       if (btnText) btnText.textContent = "Wird analysiert …";
     }
+    // Ladetext zurücksetzen
+    const loadingText = document.getElementById("loading-text");
+    if (loadingText) loadingText.textContent = "Medienberichte werden verglichen …";
   } else {
     overlay.classList.add("hidden");
     if (searchBtn) {
