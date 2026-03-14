@@ -27,6 +27,7 @@ const DEMO_DATA = {
         date: "15. März 2025",
         focus: "Umwelt",
         stil: "sachlich",
+        haltung: ["ausgewogen", "faktenorientiert"],
         excerpt:
           "Die EU-Kommission präsentierte Pläne zur schrittweisen Abkehr von Einwegkunststoffen. " +
           "Österreich ist von der Verordnung besonders betroffen, da hiesige Betriebe hohe Investitionen tätigen müssten."
@@ -39,6 +40,7 @@ const DEMO_DATA = {
         date: "14. März 2025",
         focus: "Politischer Konflikt",
         stil: "erklärend",
+        haltung: ["ausgewogen", "faktenorientiert"],
         excerpt:
           "Die neue EU-Verpackungsverordnung stößt in der Industrie auf Widerstand. " +
           "Umweltverbände begrüßen die Maßnahmen, warnen aber vor Schlupflöchern."
@@ -51,6 +53,7 @@ const DEMO_DATA = {
         date: "14. März 2025",
         focus: "Wirtschaftliche Folgen",
         stil: "sachlich",
+        haltung: ["wirtschaftsperspektive", "faktenorientiert"],
         excerpt:
           "Experten rechnen mit erheblichen Kostenbelastungen für Klein- und Mittelbetriebe. " +
           "Die Umsetzungsfristen der EU gelten als ambitioniert."
@@ -63,6 +66,7 @@ const DEMO_DATA = {
         date: "15. März 2025",
         focus: "Bürgerbelastung",
         stil: "zugespitzt",
+        haltung: ["emotionalisierend", "bueroperspektive", "regierungskritisch"],
         excerpt:
           "Die EU-Bürokraten greifen wieder in die Einkaufstasche! Was das Plastikverbot " +
           "für Österreichs Haushalte wirklich bedeutet – und wer am Ende die Rechnung bekommt."
@@ -75,6 +79,7 @@ const DEMO_DATA = {
         date: "15. März 2025",
         focus: "Alltag",
         stil: "erklärend",
+        haltung: ["bueroperspektive", "ausgewogen"],
         excerpt:
           "Von der Flasche bis zur Tiefkühlverpackung: Die EU will Plastik eindämmen. " +
           "Wir erklären, was das für den Supermarkt-Einkauf der Zukunft bedeutet."
@@ -87,6 +92,7 @@ const DEMO_DATA = {
         date: "13. März 2025",
         focus: "Unternehmen",
         stil: "zugespitzt",
+        haltung: ["alarmistisch", "emotionalisierend", "wirtschaftsperspektive"],
         excerpt:
           "Tausende Jobs könnten gefährdet sein! Österreichs Verpackungsindustrie schlägt " +
           "Alarm: Die neuen EU-Regeln überfordern heimische Betriebe."
@@ -99,6 +105,7 @@ const DEMO_DATA = {
         date: "14. März 2025",
         focus: "Wirtschaftliche Folgen",
         stil: "zugespitzt",
+        haltung: ["regierungskritisch", "wirtschaftsperspektive"],
         excerpt:
           "Wieder greift Brüssel in das Wirtschaftsleben ein. Das neue Verpackungsgesetz " +
           "belastet Unternehmen, treibt Preise und bringt kaum messbaren Umweltnutzen."

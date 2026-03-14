@@ -661,6 +661,10 @@ function createMediaCard(item, index) {
         ${item.focus ? `<span class="media-tag-badge media-tag-badge--focus">${escapeHtml(item.focus)}</span>` : ""}
         ${item.stil  ? `<span class="media-tag-badge">${escapeHtml(item.stil)}</span>` : ""}
       </div>
+      ${Array.isArray(item.haltung) && item.haltung.length > 0 ? `
+      <div class="media-haltung">
+        ${item.haltung.map(h => `<span class="haltung-tag haltung-tag--${escapeHtml(h)}">${escapeHtml(haltungLabel(h))}</span>`).join("")}
+      </div>` : ""}
     </div>
   `;
 
@@ -764,6 +768,21 @@ function renderMeaningSection(topicData) {
 function stanceLabel(haltung) {
   const map = { "dafuer": "Dafür", "dagegen": "Dagegen", "gespalten": "Gespalten", "neutral": "Neutral", "abwartend": "Abwartend" };
   return map[haltung] || haltung || "";
+}
+
+/* Hilfsfunktion: Haltungs-Tag Label */
+function haltungLabel(haltung) {
+  const map = {
+    "ausgewogen":            "⚖️ Ausgewogen",
+    "regierungskritisch":    "🔴 Regierungskritisch",
+    "regierungsfreundlich":  "🟢 Regierungsfreundlich",
+    "emotionalisierend":     "🔥 Emotionalisierend",
+    "faktenorientiert":      "📊 Faktenorientiert",
+    "bueroperspektive":      "👥 Bürgerperspektive",
+    "wirtschaftsperspektive":"🏢 Wirtschaftsperspektive",
+    "alarmistisch":          "⚠️ Alarmistisch",
+  };
+  return map[haltung] || haltung;
 }
 
 /* ---------------------------------------------------------
