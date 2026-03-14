@@ -558,6 +558,23 @@ button { cursor: pointer; font-family: inherit; }
   color: var(--color-red-accent);
 }
 
+.topic-card--today {
+  border-color: var(--color-navy);
+  box-shadow: var(--shadow-md);
+}
+
+.topic-card--today::before { opacity: 1; }
+
+.topic-card-today-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #065f46;
+  background: #d1fae5;
+  padding: 0.15rem 0.55rem;
+  border-radius: 100px;
+  letter-spacing: 0.05em;
+}
+
 /* --- Recherche-Tool --- */
 .research-tool-section {
   background: var(--color-navy);

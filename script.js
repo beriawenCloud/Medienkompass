@@ -10,9 +10,14 @@
    KONFIGURATION (Gemini API – später aktivierbar)
    --------------------------------------------------------- */
 const CONFIG = {
-  workerUrl:   "https://medienkompass-proxy.sandygall1412.workers.dev",
-  useWorker:   true,
-  searchDelay: 600,
+  // -------------------------------------------------------
+  // CLOUDFLARE WORKER – URL nach dem Deployen hier eintragen
+  // Beispiel: "https://medienkompass-proxy.DEINNAME.workers.dev"
+  // -------------------------------------------------------
+  workerUrl:    "",       // ← Worker-URL hier eintragen
+  useWorker:    false,    // ← auf true setzen sobald Worker deployed
+  // -------------------------------------------------------
+  searchDelay:  600,      // ms Ladezeit im Demo-Modus
 };
 
 /* ---------------------------------------------------------
@@ -39,9 +44,70 @@ const DOM = {
    ========================================================= */
 function initApp() {
   setupSearchListeners();
-  renderHomepageTopics();
   showApiStatus();
-  console.log("[Medienkompass] App initialisiert. API aktiv:", CONFIG.useGeminiApi);
+  loadTagesanalyse();
+  console.log("[Medienkompass] App initialisiert. Worker:", CONFIG.useWorker);
+}
+
+/* ---------------------------------------------------------
+   loadTagesanalyse: Lädt das Tagesthema vom Worker (gecacht).
+   Nur 1 API-Anfrage pro Tag – danach aus KV-Cache bedient.
+   --------------------------------------------------------- */
+async function loadTagesanalyse() {
+  if (CONFIG.useWorker && CONFIG.workerUrl) {
+    try {
+      const loadingText = document.getElementById("loading-text");
+      if (loadingText) loadingText.textContent = "Tagesthema wird geladen …";
+      showLoadingFull(true);
+
+      const response = await fetch(CONFIG.workerUrl + "/tagesanalyse");
+      if (!response.ok) throw new Error("Worker antwortet nicht.");
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      showLoadingFull(false);
+      renderHomepageWithTagesanalyse(data);
+
+    } catch (err) {
+      console.warn("[Medienkompass] Tagesthema nicht verfügbar:", err.message);
+      showLoadingFull(false);
+      renderHomepageTopics();
+    }
+  } else {
+    renderHomepageTopics();
+  }
+}
+
+/* ---------------------------------------------------------
+   showLoadingFull: Ladeindikator beim Start
+   --------------------------------------------------------- */
+function showLoadingFull(visible) {
+  const overlay = DOM.loadingOverlay();
+  if (!overlay) return;
+  if (visible) overlay.classList.remove("hidden");
+  else         overlay.classList.add("hidden");
+}
+
+/* ---------------------------------------------------------
+   renderHomepageWithTagesanalyse: Tagesthema + Demo-Themen
+   --------------------------------------------------------- */
+function renderHomepageWithTagesanalyse(tagesData) {
+  const grid = document.getElementById("topic-cards-grid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  // Tagesthema als erste, hervorgehobene Karte
+  const tagesCard = createTopicCard(tagesData, 0, true);
+  grid.appendChild(tagesCard);
+
+  // 2 Demo-Themen dahinter
+  [DEMO_DATA["co2-steuer"], DEMO_DATA["erbschaftssteuer"]]
+    .filter(Boolean)
+    .forEach(function (topic, i) {
+      grid.appendChild(createTopicCard(topic, i + 1, false));
+    });
 }
 
 /* ---------------------------------------------------------
@@ -80,26 +146,28 @@ function renderHomepageTopics() {
 /* ---------------------------------------------------------
    createTopicCard: Eine Themenkarte für die Startseite
    --------------------------------------------------------- */
-function createTopicCard(topic, index) {
+function createTopicCard(topic, index, isToday = false) {
   const card = document.createElement("div");
-  card.className = "topic-card animate-in";
+  card.className = "topic-card animate-in" + (isToday ? " topic-card--today" : "");
   card.style.animationDelay = (index * 0.1) + "s";
   card.style.opacity = "0";
 
-  // Erste 3 Medien als Preview-Badges
   const mediaBadges = (topic.media || []).slice(0, 3).map(function (m) {
     const color = getMediumColor(m.slug);
     return `<span class="topic-card-medium" style="background:${color};">${escapeHtml(m.medium)}</span>`;
   }).join("");
 
-  // Anzahl der Medien gesamt
   const totalMedia = (topic.media || []).length;
+  const todayBadge = isToday ? `<span class="topic-card-today-badge">● Heute</span>` : "";
 
   card.innerHTML = `
     <div class="topic-card-body">
       <div class="topic-card-meta">
         <span class="topic-card-date">${escapeHtml(topic.date || "")}</span>
-        <span class="topic-card-count">${totalMedia} Medien</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          ${todayBadge}
+          <span class="topic-card-count">${totalMedia} Medien</span>
+        </div>
       </div>
       <h3 class="topic-card-title">${escapeHtml(topic.title || "")}</h3>
       <p class="topic-card-summary">${escapeHtml(topic.summary || "")}</p>
@@ -111,7 +179,7 @@ function createTopicCard(topic, index) {
   `;
 
   card.addEventListener("click", function () {
-    renderTopic(topic, true, "Analyse");
+    renderTopic(topic, true, isToday ? "Tagesthema" : "Analyse");
   });
 
   return card;
@@ -330,7 +398,7 @@ async function searchTopicWithGemini(topic) {
   const prompt = buildGeminiPrompt(topic);
 
   try {
-    const response = await fetch(CONFIG.workerUrl, {
+    const response = await fetch(CONFIG.workerUrl + "/analyse", {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body:    JSON.stringify({ prompt }),
