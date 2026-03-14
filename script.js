@@ -765,8 +765,23 @@ function renderMeaningSection(topicData) {
 
   container.innerHTML = `
 
-    <!-- Zeile 1: Bürger & Unternehmen -->
-    <div class="meaning-card meaning-card--citizens animate-in">
+    <!-- Zeile 1: Politik – volle Breite, ganz oben -->
+    <div class="meaning-card meaning-card--politics animate-in meaning-card--full">
+      <div class="meaning-card-icon">🏛️</div>
+      <h3 class="meaning-card-title">Was sagen die Parteien?</h3>
+      <div class="politics-grid">
+        ${politik.map(p => `
+          <div class="politics-item">
+            <span class="politics-party">${escapeHtml(p.partei || "")}</span>
+            <span class="politics-stance politics-stance--${escapeHtml(p.haltung || "neutral")}">${escapeHtml(stanceLabel(p.haltung))}</span>
+            <p class="politics-text">${escapeHtml(p.position || "")}</p>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- Zeile 2: Bürger & Unternehmen -->
+    <div class="meaning-card meaning-card--citizens animate-in" style="animation-delay:0.07s;">
       <div class="meaning-card-icon">🏠</div>
       <h3 class="meaning-card-title">Folgen für Bürgerinnen & Bürger</h3>
       <ul class="meaning-list">
@@ -774,7 +789,7 @@ function renderMeaningSection(topicData) {
       </ul>
     </div>
 
-    <div class="meaning-card meaning-card--businesses animate-in" style="animation-delay:0.07s;">
+    <div class="meaning-card meaning-card--businesses animate-in" style="animation-delay:0.14s;">
       <div class="meaning-card-icon">🏢</div>
       <h3 class="meaning-card-title">Folgen für Unternehmen</h3>
       <ul class="meaning-list">
@@ -782,8 +797,8 @@ function renderMeaningSection(topicData) {
       </ul>
     </div>
 
-    <!-- Zeile 2: Zahlen & Internationaler Vergleich -->
-    <div class="meaning-card meaning-card--facts animate-in" style="animation-delay:0.14s;">
+    <!-- Zeile 3: Zahlen & Internationaler Vergleich -->
+    <div class="meaning-card meaning-card--facts animate-in" style="animation-delay:0.21s;">
       <div class="meaning-card-icon">📊</div>
       <h3 class="meaning-card-title">Zahlen & Fakten</h3>
       <ul class="meaning-list meaning-list--facts">
@@ -791,7 +806,7 @@ function renderMeaningSection(topicData) {
       </ul>
     </div>
 
-    <div class="meaning-card meaning-card--international animate-in" style="animation-delay:0.21s;">
+    <div class="meaning-card meaning-card--international animate-in" style="animation-delay:0.28s;">
       <div class="meaning-card-icon">🌍</div>
       <h3 class="meaning-card-title">Internationaler Vergleich</h3>
       <ul class="meaning-list">
@@ -799,8 +814,8 @@ function renderMeaningSection(topicData) {
       </ul>
     </div>
 
-    <!-- Zeile 3: Zeitlicher Horizont & Politik – volle Breite -->
-    <div class="meaning-card meaning-card--timeline animate-in meaning-card--full" style="animation-delay:0.28s;">
+    <!-- Zeile 4: Zeitlicher Horizont – volle Breite -->
+    <div class="meaning-card meaning-card--timeline animate-in meaning-card--full" style="animation-delay:0.35s;">
       <div class="meaning-card-icon">🗓️</div>
       <h3 class="meaning-card-title">Zeitlicher Horizont</h3>
       <div class="timeline-grid">
@@ -822,20 +837,6 @@ function renderMeaningSection(topicData) {
             ${(zeitHorizont.langfristig || []).map(f => `<li>${escapeHtml(f)}</li>`).join("")}
           </ul>
         </div>
-      </div>
-    </div>
-
-    <div class="meaning-card meaning-card--politics animate-in meaning-card--full" style="animation-delay:0.35s;">
-      <div class="meaning-card-icon">🏛️</div>
-      <h3 class="meaning-card-title">Was sagt die Politik?</h3>
-      <div class="politics-grid">
-        ${politik.map(p => `
-          <div class="politics-item">
-            <span class="politics-party">${escapeHtml(p.partei || "")}</span>
-            <span class="politics-stance politics-stance--${escapeHtml(p.haltung || "neutral")}">${escapeHtml(stanceLabel(p.haltung))}</span>
-            <p class="politics-text">${escapeHtml(p.position || "")}</p>
-          </div>
-        `).join("")}
       </div>
     </div>
 
