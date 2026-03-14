@@ -14,8 +14,8 @@ const CONFIG = {
   // CLOUDFLARE WORKER – URL nach dem Deployen hier eintragen
   // Beispiel: "https://medienkompass-proxy.DEINNAME.workers.dev"
   // -------------------------------------------------------
-   workerUrl:  "https://medienkompass-proxy.DEINNAME.workers.dev",
-  useWorker:  true,
+  workerUrl: "https://medienkompass-proxy.sandygall1412.workers.dev",
+useWorker: true,
   // -------------------------------------------------------
   searchDelay:  600,      // ms Ladezeit im Demo-Modus
 };
