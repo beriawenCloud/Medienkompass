@@ -48,14 +48,6 @@
   <input type="text" id="topic-input" style="display:none;" />
   <button id="search-btn" style="display:none;"><span class="btn-text">Vergleich starten</span></button>
 
-  <!-- ===== LOADING INDICATOR ===== -->
-  <div id="loading-overlay" class="loading-overlay hidden" aria-live="polite">
-    <div class="loading-inner">
-      <div class="loading-spinner"></div>
-      <p id="loading-text">Medienberichte werden verglichen …</p>
-    </div>
-  </div>
-
   <!-- ===== STARTSEITE (wird bei Suche ausgeblendet) ===== -->
   <div id="homepage" class="homepage">
 
@@ -106,6 +98,13 @@
 
   <!-- ===== ERGEBNISBEREICH (wird dynamisch befüllt) ===== -->
   <main id="results-area" class="results-area hidden">
+    <!-- Ladeindikator für Recherche-Tool -->
+    <div id="loading-overlay" class="loading-overlay hidden" aria-live="polite">
+      <div class="loading-inner">
+        <div class="loading-spinner"></div>
+        <p id="loading-text">Medienberichte werden verglichen …</p>
+      </div>
+    </div>
     <div class="container">
 
       <!-- Zurück-Button -->
@@ -157,7 +156,7 @@
         <div id="questions-content" class="questions-grid"></div>
       </section>
 
-    </div>
+    </div><!-- /container -->
   </main>
 
   <!-- ===== ALT: Kartenstreifen (inaktiv) ===== -->

@@ -84,29 +84,32 @@ function renderHomepageWithTagesanalyse(data) {
   grid.innerHTML = "";
 
   const slots = [
-    { topic: data.heute,      label: "● Heute",      isToday: true  },
-    { topic: data.gestern,    label: "Gestern",       isToday: false },
-    { topic: data.vorgestern, label: "Vorgestern",    isToday: false },
+    { topic: data.heute,      label: "● Heute",        isToday: true  },
+    { topic: data.gestern,    label: "Gestern",         isToday: false },
+    { topic: data.vorgestern, label: "Vorgestern",      isToday: false },
+    { topic: data.tag4,       label: "Vor 3 Tagen",     isToday: false },
+    { topic: data.tag5,       label: "Vor 4 Tagen",     isToday: false },
   ];
 
-  slots.forEach(function (slot, i) {
-    if (slot.topic) {
-      const card = createTopicCard(slot.topic, i, slot.isToday, slot.label);
-      grid.appendChild(card);
-    }
+  // Nur vorhandene Slots anzeigen
+  const vorhandene = slots.filter(s => s.topic);
+
+  // Fallback: mit Demo-Themen auffüllen bis mindestens 3
+  const demos = [
+    DEMO_DATA["co2-steuer"],
+    DEMO_DATA["erbschaftssteuer"],
+    DEMO_DATA["eu-kunststoffverpackungen"]
+  ];
+
+  let index = 0;
+  vorhandene.forEach(function (slot) {
+    grid.appendChild(createTopicCard(slot.topic, index++, slot.isToday, slot.label));
   });
 
-  // Fallback: wenn weniger als 3 echte Themen, Demo-Themen auffüllen
-  const filled = slots.filter(s => s.topic).length;
-  if (filled < 3) {
-    const demos = [
-      DEMO_DATA["co2-steuer"],
-      DEMO_DATA["erbschaftssteuer"],
-      DEMO_DATA["eu-kunststoffverpackungen"]
-    ].slice(0, 3 - filled);
-
-    demos.forEach(function (topic, i) {
-      if (topic) grid.appendChild(createTopicCard(topic, filled + i, false));
+  // Demo-Themen auffüllen wenn weniger als 3 echte Themen
+  if (vorhandene.length < 3) {
+    demos.slice(0, 3 - vorhandene.length).forEach(function (topic) {
+      if (topic) grid.appendChild(createTopicCard(topic, index++, false));
     });
   }
 }
@@ -128,17 +131,9 @@ function showApiStatus() {
    showLoadingFull: Ladeindikator beim Start
    --------------------------------------------------------- */
 function showLoadingFull(visible) {
-  const overlay = DOM.loadingOverlay();
-  if (!overlay) return;
-  if (visible) {
-    overlay.classList.remove("hidden");
-    overlay.style.position = "relative";
-    overlay.style.padding  = "3rem 0";
-  } else {
-    overlay.classList.add("hidden");
-    overlay.style.position = "";
-    overlay.style.padding  = "";
-  }
+  // Beim Laden des Tagesthemas keinen Overlay zeigen –
+  // die Karten erscheinen einfach sobald sie da sind.
+  // (Kein sichtbarer Ladeindikator nötig)
 }
 
 /* ---------------------------------------------------------
@@ -805,20 +800,18 @@ function renderNoResults(topic) {
   const summaryEl = DOM.topicSummary();
   const dateEl    = DOM.topicDate();
 
-  if (titleEl)   titleEl.textContent = `„${topic}" – kein Demo-Thema gefunden`;
+  if (titleEl)   titleEl.textContent = `„${topic}" – Analyse nicht verfügbar`;
   if (summaryEl) summaryEl.innerHTML =
-    `Für dieses Thema sind noch keine Demo-Daten hinterlegt. ` +
-    `Sobald die Gemini&nbsp;API aktiviert ist, werden echte Mediendaten analysiert. ` +
-    `<br><br>Verfügbare Demo-Themen: ` +
-    `<strong>Kunststoffverpackungen</strong>, <strong>CO2-Steuer</strong>, <strong>Erbschaftssteuer</strong>.`;
-  if (dateEl)    dateEl.textContent = "";
+    CONFIG.useWorker && CONFIG.workerUrl
+      ? `Die Analyse konnte nicht geladen werden. Bitte versuche es später nochmal.`
+      : `Für dieses Thema sind noch keine Demo-Daten hinterlegt. ` +
+        `Verfügbare Demo-Themen: <strong>Kunststoffverpackungen</strong>, <strong>CO2-Steuer</strong>, <strong>Erbschaftssteuer</strong>.`;
+  if (dateEl) dateEl.textContent = "";
 
   const mediaGrid = DOM.mediaCardsGrid();
   if (mediaGrid) mediaGrid.innerHTML = "";
-
   const meaningContent = DOM.meaningContent();
   if (meaningContent) meaningContent.innerHTML = "";
-
   const questionsContent = DOM.questionsContent();
   if (questionsContent) questionsContent.innerHTML = "";
 
@@ -840,18 +833,26 @@ function showLoading(visible) {
   if (!overlay) return;
 
   if (visible) {
+    // Ergebnisbereich zeigen (mit Spinner drin), Inhalt ausblenden
+    if (resultsArea) resultsArea.classList.remove("hidden");
     overlay.classList.remove("hidden");
-    if (resultsArea) resultsArea.classList.add("hidden");
+    // Inhalte ausblenden während geladen wird
+    const sections = resultsArea ? resultsArea.querySelectorAll("section, .back-bar") : [];
+    sections.forEach(s => s.style.visibility = "hidden");
+
     if (searchBtn) {
       searchBtn.disabled = true;
       const btnText = searchBtn.querySelector(".btn-text");
       if (btnText) btnText.textContent = "Wird analysiert …";
     }
-    // Ladetext zurücksetzen
     const loadingText = document.getElementById("loading-text");
     if (loadingText) loadingText.textContent = "Medienberichte werden verglichen …";
   } else {
     overlay.classList.add("hidden");
+    // Inhalte wieder zeigen
+    const sections = resultsArea ? resultsArea.querySelectorAll("section, .back-bar") : [];
+    sections.forEach(s => s.style.visibility = "");
+
     if (searchBtn) {
       searchBtn.disabled = false;
       const btnText = searchBtn.querySelector(".btn-text");
