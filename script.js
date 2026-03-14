@@ -81,78 +81,98 @@ function renderHomepageWithTagesanalyse(data) {
   const todayGrid   = document.getElementById("topic-today-grid");
   const recentGrid  = document.getElementById("topic-recent-grid");
   const archiveGrid = document.getElementById("topic-archive-grid");
-  if (!todayGrid || !recentGrid || !archiveGrid) return;
+  if (!todayGrid) return;
 
   todayGrid.innerHTML = "";
-  recentGrid.innerHTML = "";
-  archiveGrid.innerHTML = "";
-
-  // Demo-Themen nach Datum sortiert (neueste zuerst)
-  const demoKeys = [
-    "eu-kunststoffverpackungen", // 10.–11. März 2026
-    "frauentag",                 // 8. März 2026
-    "co2-steuer",                // 6.–7. März 2026
-    "erbschaftssteuer",          // 3.–4. März 2026
-    "naher-osten",               // 1.–2. März 2026
-    "spritpreise",               // 26.–27. Feb. 2026
-    "energiepreise-nahost",      // 24.–25. Feb. 2026
-    "inflation",                 // 22.–23. Feb. 2026
-    "gletscher",                 // 19.–20. Feb. 2026
-    "sicherheitspolitik",        // 17.–18. Feb. 2026
-    "pensionsreform",            // 14.–15. Feb. 2026
-    "wohnkosten",                // 12.–13. Feb. 2026
-    "bildung",                   // 10.–11. Feb. 2026
-    "digitalsteuer",             // 7.–8. Feb. 2026
-  ];
+  if (recentGrid)  recentGrid.innerHTML = "";
+  if (archiveGrid) archiveGrid.innerHTML = "";
 
   const labels = ["heute","gestern","vorgestern","tag4","tag5","tag6","tag7",
-                   "tag8","tag9","tag10","tag11","tag12","tag13","tag14","tag15"];
+                  "tag8","tag9","tag10","tag11","tag12","tag13","tag14","tag15"];
+  const dayLabels = ["● Heute","Gestern","Vorgestern","Vor 3 Tagen","Vor 4 Tagen",
+                     "Vor 5 Tagen","Vor 6 Tagen","Vor 7 Tagen","Vor 8 Tagen","Vor 9 Tagen",
+                     "Vor 10 Tagen","Vor 11 Tagen","Vor 12 Tagen","Vor 13 Tagen","Vor 14 Tagen"];
 
-  // Alle 15 Slots befüllen – echte Daten oder Demo
-  const alle = labels.map(function(label, i) {
-    return { topic: data[label] || null, label: label, index: i };
-  });
-
-  let demoIndex = 0;
-  const befuellt = alle.map(function(slot) {
-    if (slot.topic) return slot;
-    const demoKey = demoKeys[demoIndex % demoKeys.length];
-    demoIndex++;
-    return { topic: DEMO_DATA[demoKey] || null, label: "demo", index: slot.index };
-  });
-
-  // Heute (Slot 0) → today-grid, volle Breite
-  if (befuellt[0] && befuellt[0].topic) {
-    const isReal = alle[0].topic !== null;
-    todayGrid.appendChild(createTopicCard(befuellt[0].topic, 0, true, isReal ? "● Heute" : "● Demo"));
+  // Heute → today-grid
+  const heuteTopic = data[labels[0]];
+  if (heuteTopic) {
+    todayGrid.appendChild(createTopicCard(heuteTopic, 0, true, dayLabels[0]));
+  } else {
+    todayGrid.appendChild(createPlaceholderCard(0, dayLabels[0]));
   }
 
-  // Gestern / Vorgestern / Vor 3 Tagen (Slots 1–3) → recent-grid
-  const dayLabels = ["Gestern", "Vorgestern", "Vor 3 Tagen"];
-  befuellt.slice(1, 4).forEach(function(slot, i) {
-    if (!slot.topic) return;
-    const isReal = alle[i+1].topic !== null;
-    const label  = isReal ? dayLabels[i] : "Demo";
-    recentGrid.appendChild(createTopicCard(slot.topic, i, false, label));
-  });
+  // Gestern / Vorgestern / Vor 3 Tagen → recent-grid
+  for (let i = 1; i <= 3; i++) {
+    const topic = data[labels[i]];
+    if (topic) {
+      recentGrid.appendChild(createTopicCard(topic, i - 1, false, dayLabels[i]));
+    } else {
+      recentGrid.appendChild(createPlaceholderCard(i - 1, dayLabels[i]));
+    }
+  }
 
-  // Rest (Slots 4–14) → archive-grid
-  befuellt.slice(4).forEach(function(slot, i) {
-    if (!slot.topic) return;
-    const isReal = alle[i+4].topic !== null;
-    const label  = isReal ? `Vor ${i+4} Tagen` : "Demo";
-    archiveGrid.appendChild(createTopicCard(slot.topic, i, false, label));
+  // Rest → archive-grid
+  for (let i = 4; i < labels.length; i++) {
+    const topic = data[labels[i]];
+    if (topic) {
+      archiveGrid.appendChild(createTopicCard(topic, i - 4, false, dayLabels[i]));
+    } else {
+      archiveGrid.appendChild(createPlaceholderCard(i - 4, dayLabels[i]));
+    }
+  }
+}
+
+function renderHomepageTopics() {
+  const todayGrid   = document.getElementById("topic-today-grid");
+  const recentGrid  = document.getElementById("topic-recent-grid");
+  const archiveGrid = document.getElementById("topic-archive-grid");
+  if (!todayGrid) return;
+
+  todayGrid.innerHTML  = "";
+  if (recentGrid)  recentGrid.innerHTML  = "";
+  if (archiveGrid) archiveGrid.innerHTML = "";
+
+  // Alles Platzhalter
+  todayGrid.appendChild(createPlaceholderCard(0, "● Heute"));
+  const recentLabels = ["Gestern", "Vorgestern", "Vor 3 Tagen"];
+  recentLabels.forEach(function(label, i) {
+    recentGrid.appendChild(createPlaceholderCard(i, label));
   });
+  for (let i = 4; i < 15; i++) {
+    archiveGrid.appendChild(createPlaceholderCard(i - 4, `Vor ${i} Tagen`));
+  }
+}
+
+function createPlaceholderCard(index, dayLabel) {
+  const card = document.createElement("div");
+  card.className = "topic-card topic-card--placeholder animate-in";
+  card.style.animationDelay = (index * 0.05) + "s";
+  card.style.opacity = "0";
+
+  const isToday = dayLabel && dayLabel.includes("Heute");
+  const badgeClass = isToday ? "topic-card-today-badge" : "topic-card-day-badge";
+
+  card.innerHTML = `
+    <div class="topic-card-body topic-card-body--placeholder">
+      <div class="topic-card-meta">
+        <span class="topic-card-date">–</span>
+        <span class="${badgeClass}">${escapeHtml(dayLabel || "")}</span>
+      </div>
+      <div class="placeholder-icon">📅</div>
+      <p class="placeholder-text">Noch kein Thema für diesen Tag</p>
+    </div>
+  `;
+  return card;
 }
 
 function toggleArchive() {
-  const grid   = document.getElementById("topic-archive-grid");
-  const text   = document.getElementById("archive-toggle-text");
-  const icon   = document.getElementById("archive-toggle-icon");
+  const grid = document.getElementById("topic-archive-grid");
+  const text = document.getElementById("archive-toggle-text");
+  const icon = document.getElementById("archive-toggle-icon");
   if (!grid) return;
-  const open = grid.classList.toggle("hidden");
-  text.textContent = open ? "Ältere Themen anzeigen" : "Ältere Themen ausblenden";
-  icon.textContent = open ? "↓" : "↑";
+  const isHidden = grid.classList.toggle("hidden");
+  text.textContent = isHidden ? "Ältere Themen anzeigen" : "Ältere Themen ausblenden";
+  icon.textContent = isHidden ? "↓" : "↑";
 }
 
 /* ---------------------------------------------------------
