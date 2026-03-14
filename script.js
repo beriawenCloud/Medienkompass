@@ -96,18 +96,18 @@ function renderHomepageWithTagesanalyse(data) {
   // Heute → today-grid
   const heuteTopic = data[labels[0]];
   if (heuteTopic) {
-    todayGrid.appendChild(createTopicCard(heuteTopic, 0, true, dayLabels[0]));
+    todayGrid.appendChild(createTopicCard(heuteTopic, 0, true, null));
   } else {
-    todayGrid.appendChild(createPlaceholderCard(0, dayLabels[0]));
+    todayGrid.appendChild(createPlaceholderCard(0, "Heute"));
   }
 
   // Gestern / Vorgestern / Vor 3 Tagen → recent-grid
   for (let i = 1; i <= 3; i++) {
     const topic = data[labels[i]];
     if (topic) {
-      recentGrid.appendChild(createTopicCard(topic, i - 1, false, dayLabels[i]));
+      recentGrid.appendChild(createTopicCard(topic, i - 1, false, null));
     } else {
-      recentGrid.appendChild(createPlaceholderCard(i - 1, dayLabels[i]));
+      recentGrid.appendChild(createPlaceholderCard(i - 1, "–"));
     }
   }
 
@@ -115,9 +115,9 @@ function renderHomepageWithTagesanalyse(data) {
   for (let i = 4; i < labels.length; i++) {
     const topic = data[labels[i]];
     if (topic) {
-      archiveGrid.appendChild(createTopicCard(topic, i - 4, false, dayLabels[i]));
+      archiveGrid.appendChild(createTopicCard(topic, i - 4, false, null));
     } else {
-      archiveGrid.appendChild(createPlaceholderCard(i - 4, dayLabels[i]));
+      archiveGrid.appendChild(createPlaceholderCard(i - 4, "–"));
     }
   }
 }
@@ -251,11 +251,10 @@ function createTopicCard(topic, index, isToday = false, dayLabel = null) {
 
   const totalMedia = (topic.media || []).length;
 
-  // Badge: Heute / Gestern / Vorgestern
+  // Badge: nur "● Heute" für aktuelles Thema
   let dayBadge = "";
-  if (dayLabel) {
-    const badgeClass = isToday ? "topic-card-today-badge" : "topic-card-day-badge";
-    dayBadge = `<span class="${badgeClass}">${escapeHtml(dayLabel)}</span>`;
+  if (isToday) {
+    dayBadge = `<span class="topic-card-today-badge">● Heute</span>`;
   }
 
   card.innerHTML = `
