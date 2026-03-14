@@ -75,34 +75,40 @@ async function loadTagesanalyse() {
 }
 
 /* ---------------------------------------------------------
-   showLoadingFull: Ladeindikator beim Start
+   renderHomepageWithTagesanalyse: Heute / Gestern / Vorgestern
    --------------------------------------------------------- */
-function showLoadingFull(visible) {
-  const overlay = DOM.loadingOverlay();
-  if (!overlay) return;
-  if (visible) overlay.classList.remove("hidden");
-  else         overlay.classList.add("hidden");
-}
-
-/* ---------------------------------------------------------
-   renderHomepageWithTagesanalyse: Tagesthema + Demo-Themen
-   --------------------------------------------------------- */
-function renderHomepageWithTagesanalyse(tagesData) {
+function renderHomepageWithTagesanalyse(data) {
   const grid = document.getElementById("topic-cards-grid");
   if (!grid) return;
 
   grid.innerHTML = "";
 
-  // Tagesthema als erste, hervorgehobene Karte
-  const tagesCard = createTopicCard(tagesData, 0, true);
-  grid.appendChild(tagesCard);
+  const slots = [
+    { topic: data.heute,      label: "● Heute",      isToday: true  },
+    { topic: data.gestern,    label: "Gestern",       isToday: false },
+    { topic: data.vorgestern, label: "Vorgestern",    isToday: false },
+  ];
 
-  // 2 Demo-Themen dahinter
-  [DEMO_DATA["co2-steuer"], DEMO_DATA["erbschaftssteuer"]]
-    .filter(Boolean)
-    .forEach(function (topic, i) {
-      grid.appendChild(createTopicCard(topic, i + 1, false));
+  slots.forEach(function (slot, i) {
+    if (slot.topic) {
+      const card = createTopicCard(slot.topic, i, slot.isToday, slot.label);
+      grid.appendChild(card);
+    }
+  });
+
+  // Fallback: wenn weniger als 3 echte Themen, Demo-Themen auffüllen
+  const filled = slots.filter(s => s.topic).length;
+  if (filled < 3) {
+    const demos = [
+      DEMO_DATA["co2-steuer"],
+      DEMO_DATA["erbschaftssteuer"],
+      DEMO_DATA["eu-kunststoffverpackungen"]
+    ].slice(0, 3 - filled);
+
+    demos.forEach(function (topic, i) {
+      if (topic) grid.appendChild(createTopicCard(topic, filled + i, false));
     });
+  }
 }
 
 /* ---------------------------------------------------------
@@ -116,6 +122,16 @@ function showApiStatus() {
   } else {
     hint.innerHTML = `<span class="api-demo">○ Demo-Modus – Worker noch nicht konfiguriert</span>`;
   }
+}
+
+/* ---------------------------------------------------------
+   showLoadingFull: Ladeindikator beim Start
+   --------------------------------------------------------- */
+function showLoadingFull(visible) {
+  const overlay = DOM.loadingOverlay();
+  if (!overlay) return;
+  if (visible) overlay.classList.remove("hidden");
+  else         overlay.classList.add("hidden");
 }
 
 /* ---------------------------------------------------------
@@ -141,7 +157,7 @@ function renderHomepageTopics() {
 /* ---------------------------------------------------------
    createTopicCard: Eine Themenkarte für die Startseite
    --------------------------------------------------------- */
-function createTopicCard(topic, index, isToday = false) {
+function createTopicCard(topic, index, isToday = false, dayLabel = null) {
   const card = document.createElement("div");
   card.className = "topic-card animate-in" + (isToday ? " topic-card--today" : "");
   card.style.animationDelay = (index * 0.1) + "s";
@@ -153,14 +169,20 @@ function createTopicCard(topic, index, isToday = false) {
   }).join("");
 
   const totalMedia = (topic.media || []).length;
-  const todayBadge = isToday ? `<span class="topic-card-today-badge">● Heute</span>` : "";
+
+  // Badge: Heute / Gestern / Vorgestern
+  let dayBadge = "";
+  if (dayLabel) {
+    const badgeClass = isToday ? "topic-card-today-badge" : "topic-card-day-badge";
+    dayBadge = `<span class="${badgeClass}">${escapeHtml(dayLabel)}</span>`;
+  }
 
   card.innerHTML = `
     <div class="topic-card-body">
       <div class="topic-card-meta">
         <span class="topic-card-date">${escapeHtml(topic.date || "")}</span>
         <div style="display:flex;gap:6px;align-items:center;">
-          ${todayBadge}
+          ${dayBadge}
           <span class="topic-card-count">${totalMedia} Medien</span>
         </div>
       </div>
@@ -174,7 +196,7 @@ function createTopicCard(topic, index, isToday = false) {
   `;
 
   card.addEventListener("click", function () {
-    renderTopic(topic, true, isToday ? "Tagesthema" : "Analyse");
+    renderTopic(topic, true, dayLabel || "Analyse");
   });
 
   return card;

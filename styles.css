@@ -575,6 +575,15 @@ button { cursor: pointer; font-family: inherit; }
   letter-spacing: 0.05em;
 }
 
+.topic-card-day-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  padding: 0.15rem 0.55rem;
+  border-radius: 100px;
+}
+
 /* --- Recherche-Tool --- */
 .research-tool-section {
   background: var(--color-navy);
