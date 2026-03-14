@@ -184,9 +184,7 @@ function createTopicCard(topic, index, isToday = false) {
    showHomepage: Zurück zur Startseite
    --------------------------------------------------------- */
 function showHomepage() {
-  const homepage    = document.getElementById("homepage");
   const resultsArea = DOM.resultsArea();
-  if (homepage)    homepage.classList.remove("hidden");
   if (resultsArea) resultsArea.classList.add("hidden");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -546,25 +544,18 @@ Nur JSON ausgeben. Kein Text, keine Erklärungen, keine Markdown-Codeblöcke.
 function renderTopic(topicData, scrollToResults = true, label = "Analyse") {
   if (!topicData) return;
 
-  // Homepage ausblenden
-  const homepage = document.getElementById("homepage");
-  if (homepage) homepage.classList.add("hidden");
-
-  // Alten Kartenstreifen ausblenden
-  const weekSection = DOM.topicOfWeek();
-  if (weekSection) weekSection.classList.add("hidden");
-
+  // Homepage BLEIBT sichtbar – nur Ergebnisse einblenden
   const resultsArea = DOM.resultsArea();
   if (resultsArea) {
     resultsArea.classList.remove("hidden");
     if (scrollToResults) {
       setTimeout(function () {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     }
   }
 
-  // Source-Badge: zeigt ob API oder Demo
+  // Source-Badge
   const sourceBadge = document.getElementById("topic-source-badge");
   if (sourceBadge) {
     if (CONFIG.useWorker && CONFIG.workerUrl) {
@@ -774,9 +765,6 @@ function renderQuestions(questions) {
    renderNoResults: Kein passendes Demo-Thema gefunden
    --------------------------------------------------------- */
 function renderNoResults(topic) {
-  const homepage = document.getElementById("homepage");
-  if (homepage) homepage.classList.add("hidden");
-
   const weekSection = DOM.topicOfWeek();
   if (weekSection) weekSection.classList.add("hidden");
 
@@ -818,7 +806,6 @@ function renderNoResults(topic) {
 function showLoading(visible) {
   const overlay    = DOM.loadingOverlay();
   const resultsArea = DOM.resultsArea();
-  const homepage   = document.getElementById("homepage");
   const searchBtn  = DOM.searchBtn();
 
   if (!overlay) return;
@@ -826,16 +813,17 @@ function showLoading(visible) {
   if (visible) {
     overlay.classList.remove("hidden");
     if (resultsArea) resultsArea.classList.add("hidden");
-    if (homepage)    homepage.classList.add("hidden");
     if (searchBtn) {
       searchBtn.disabled = true;
-      searchBtn.querySelector(".btn-text").textContent = "Wird analysiert …";
+      const btnText = searchBtn.querySelector(".btn-text");
+      if (btnText) btnText.textContent = "Wird analysiert …";
     }
   } else {
     overlay.classList.add("hidden");
     if (searchBtn) {
       searchBtn.disabled = false;
-      searchBtn.querySelector(".btn-text").textContent = "Vergleich starten";
+      const btnText = searchBtn.querySelector(".btn-text");
+      if (btnText) btnText.textContent = "Vergleich starten";
     }
   }
 }
