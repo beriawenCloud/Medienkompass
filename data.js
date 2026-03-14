@@ -3,16 +3,8 @@
    Keine Demo-Inhalte – nur Platzhalter
    ========================================================= */
 
-const DEMO_DATA = {}; // Keine Demo-Inhalte
-
-const PLACEHOLDER = {
-  isPlaceholder: true,
-  title: "Kein Thema für diesen Tag",
-  summary: "",
-  date: "",
-  media: []
-};
-
+const DEMO_DATA = {};
+const WEEK_TOPIC_KEY = null;
 const KEYWORD_MAP = {};
 
 const DEFAULT_QUESTIONS = [
