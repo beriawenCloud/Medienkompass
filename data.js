@@ -85,19 +85,6 @@ const DEMO_DATA = {
           "Wir erklären, was das für den Supermarkt-Einkauf der Zukunft bedeutet."
       },
       {
-        medium: "oe24",
-        slug: "oe24",
-        url: "https://www.oe24.at/suche?q=Kunststoffverpackungen",
-        headline: "PLASTIKSHOCK: EU-Verpackungsverbot trifft österreichische Firmen hart",
-        date: "13. März 2025",
-        focus: "Unternehmen",
-        stil: "zugespitzt",
-        haltung: ["alarmistisch", "emotionalisierend", "wirtschaftsperspektive"],
-        excerpt:
-          "Tausende Jobs könnten gefährdet sein! Österreichs Verpackungsindustrie schlägt " +
-          "Alarm: Die neuen EU-Regeln überfordern heimische Betriebe."
-      },
-      {
         medium: "exxpress",
         slug: "exxpress",
         url: "https://exxpress.at/?s=Kunststoffverpackungen",
@@ -251,18 +238,6 @@ const DEMO_DATA = {
           "und welche Entlastungen nach dem Ende des Klimabonus noch übrig geblieben sind."
       },
       {
-        medium: "oe24",
-        slug: "oe24",
-        url: "https://www.oe24.at/suche?q=CO2+Steuer",
-        headline: "CO2-HAMMER: Teurer tanken, kein Ausgleich – das kostet Sie hunderte Euro!",
-        date: "19. Feb. 2025",
-        focus: "Bürgerbelastung",
-        stil: "zugespitzt",
-        excerpt:
-          "Die Rechnung haben wir gemacht: CO2-Preis hoch, Klimabonus weg. " +
-          "Ein Durchschnittshaushalt zahlt 2025 deutlich mehr – ohne jeden staatlichen Ausgleich."
-      },
-      {
         medium: "exxpress",
         slug: "exxpress",
         url: "https://exxpress.at/?s=CO2+Steuer",
@@ -413,18 +388,6 @@ const DEMO_DATA = {
         excerpt:
           "Würde die Erbschaftssteuer kommen – wer wäre betroffen? Wir erklären " +
           "mögliche Freibeträge, Steuersätze und was das für Häuser und Sparguthaben bedeutet."
-      },
-      {
-        medium: "oe24",
-        slug: "oe24",
-        url: "https://www.oe24.at/suche?q=Erbschaftssteuer",
-        headline: "STEUER-ALARM: Rot-Grün plant Erbschaftssteuer-Hammer für alle!",
-        date: "9. Jän. 2025",
-        focus: "Politischer Konflikt",
-        stil: "zugespitzt",
-        excerpt:
-          "Die Linksparteien wollen Ihnen ans Erbe! Erbschaftssteuer würde " +
-          "Mittelstand und Eigenheimbesitzer treffen – nicht nur Millionäre."
       },
       {
         medium: "exxpress",

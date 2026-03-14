@@ -551,7 +551,6 @@ Medien in dieser Reihenfolge mit typischem Stil:
 - Die Presse (slug: presse) → sachlich, wirtschaftsnah, konservativ-liberal
 - Kronen Zeitung (slug: krone) → zugespitzt, boulevardesk, lesernah
 - Heute (slug: heute) → erklärend, vereinfacht, alltagsorientiert
-- oe24 (slug: oe24) → zugespitzt, emotional, schlagzeilenorientiert
 - exxpress (slug: exxpress) → zugespitzt, wirtschaftsliberal, EU-kritisch
 
 Nur JSON ausgeben. Kein Text, keine Erklärungen, keine Markdown-Codeblöcke.
@@ -908,7 +907,6 @@ function getMediumColor(slug) {
     "presse":   "#1a1a1a",
     "krone":    "#d4001a",
     "heute":    "#ff6600",
-    "oe24":     "#0078c8",
     "exxpress": "#222222"
   };
   return colors[slug] || "#6b7280";
