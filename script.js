@@ -729,7 +729,7 @@ function createMediaCard(item, index) {
         <span class="media-name">${escapeHtml(item.medium || "")}</span>
         <div class="media-name-right">
           <span class="media-date">${escapeHtml(item.date || "")}</span>
-          ${item.url ? `<span class="media-link-icon" aria-hidden="true" title="Artikel öffnen">↗</span>` : ""}
+          ${item.url ? `<span class="media-link-icon" aria-hidden="true" title="Beim Medium suchen">🔍</span>` : ""}
         </div>
       </div>
       <p class="media-headline">${escapeHtml(item.headline || "")}</p>

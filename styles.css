@@ -133,6 +133,18 @@ button { cursor: pointer; font-family: inherit; }
   line-height: 1.6;
 }
 
+.ai-disclaimer {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.85rem;
+  margin-top: var(--spacing-sm);
+  max-width: 640px;
+  line-height: 1.5;
+}
+
 /* =========================================================
    HEADER
    ========================================================= */
