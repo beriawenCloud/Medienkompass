@@ -437,6 +437,72 @@ button { cursor: pointer; font-family: inherit; }
   gap: var(--spacing-md);
 }
 
+/* Heute – 1 Karte volle Breite */
+.topic-today-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.topic-today-grid .topic-card {
+  max-width: 100%;
+}
+
+.topic-today-grid .topic-card-title {
+  font-size: 1.5rem;
+}
+
+.topic-today-grid .topic-card-summary {
+  font-size: 1rem;
+  -webkit-line-clamp: 4;
+}
+
+/* Letzte Tage – 3 Spalten */
+.section-header--sub {
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Archiv */
+.archive-section {
+  margin-top: var(--spacing-xl);
+}
+
+.archive-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-navy);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: var(--spacing-md);
+}
+
+.archive-toggle-btn:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border-dark);
+}
+
+.archive-toggle-icon {
+  font-size: 0.8rem;
+  transition: transform var(--transition-fast);
+}
+
+.archive-grid {
+  margin-top: var(--spacing-md);
+}
+
+.archive-grid.hidden {
+  display: none;
+}
+
 .topic-card {
   background: var(--color-bg);
   border: 1px solid var(--color-border);

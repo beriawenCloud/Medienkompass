@@ -59,10 +59,27 @@
           <h2 class="section-title">Was Österreich heute bewegt</h2>
           <p class="section-subtitle">Täglich aktuell – wie berichten Österreichs Medien über das wichtigste Thema?</p>
         </div>
-        <div class="topic-cards-grid" id="topic-cards-grid"></div>
+
+        <!-- Heutiges Thema (1 Karte, volle Breite) -->
+        <div id="topic-today-grid" class="topic-today-grid"></div>
+
+        <!-- Letzte 3 Tage -->
+        <div class="section-header section-header--sub">
+          <div class="section-label">Letzte Tage</div>
+        </div>
+        <div id="topic-recent-grid" class="topic-cards-grid"></div>
+
+        <!-- Ältere Themen (ausklappbar) -->
+        <div class="archive-section" id="archive-section">
+          <button class="archive-toggle-btn" id="archive-toggle" onclick="toggleArchive()">
+            <span id="archive-toggle-text">Ältere Themen anzeigen</span>
+            <span class="archive-toggle-icon" id="archive-toggle-icon">↓</span>
+          </button>
+          <div id="topic-archive-grid" class="topic-cards-grid archive-grid hidden"></div>
+        </div>
+
       </div>
     </section>
-
 
   </div><!-- /homepage -->
 

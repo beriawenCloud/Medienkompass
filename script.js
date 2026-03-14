@@ -78,45 +78,81 @@ async function loadTagesanalyse() {
    renderHomepageWithTagesanalyse: Heute / Gestern / Vorgestern
    --------------------------------------------------------- */
 function renderHomepageWithTagesanalyse(data) {
-  const grid = document.getElementById("topic-cards-grid");
-  if (!grid) return;
-  grid.innerHTML = "";
+  const todayGrid   = document.getElementById("topic-today-grid");
+  const recentGrid  = document.getElementById("topic-recent-grid");
+  const archiveGrid = document.getElementById("topic-archive-grid");
+  if (!todayGrid || !recentGrid || !archiveGrid) return;
 
-  const slots = [
-    { topic: data.heute,      label: "● Heute",      isToday: true  },
-    { topic: data.gestern,    label: "Gestern",       isToday: false },
-    { topic: data.vorgestern, label: "Vorgestern",    isToday: false },
-    { topic: data.tag4,       label: "Vor 3 Tagen",   isToday: false },
-    { topic: data.tag5,       label: "Vor 4 Tagen",   isToday: false },
-    { topic: data.tag6,       label: "Vor 5 Tagen",   isToday: false },
-    { topic: data.tag7,       label: "Vor 6 Tagen",   isToday: false },
-    { topic: data.tag8,       label: "Vor 7 Tagen",   isToday: false },
-    { topic: data.tag9,       label: "Vor 8 Tagen",   isToday: false },
-    { topic: data.tag10,      label: "Vor 9 Tagen",   isToday: false },
-    { topic: data.tag11,      label: "Vor 10 Tagen",  isToday: false },
-    { topic: data.tag12,      label: "Vor 11 Tagen",  isToday: false },
-    { topic: data.tag13,      label: "Vor 12 Tagen",  isToday: false },
-    { topic: data.tag14,      label: "Vor 13 Tagen",  isToday: false },
-    { topic: data.tag15,      label: "Vor 14 Tagen",  isToday: false },
+  todayGrid.innerHTML = "";
+  recentGrid.innerHTML = "";
+  archiveGrid.innerHTML = "";
+
+  // Demo-Themen nach Datum sortiert (neueste zuerst)
+  const demoKeys = [
+    "eu-kunststoffverpackungen", // 10.–11. März 2026
+    "frauentag",                 // 8. März 2026
+    "co2-steuer",                // 6.–7. März 2026
+    "erbschaftssteuer",          // 3.–4. März 2026
+    "naher-osten",               // 1.–2. März 2026
+    "spritpreise",               // 26.–27. Feb. 2026
+    "energiepreise-nahost",      // 24.–25. Feb. 2026
+    "inflation",                 // 22.–23. Feb. 2026
+    "gletscher",                 // 19.–20. Feb. 2026
+    "sicherheitspolitik",        // 17.–18. Feb. 2026
+    "pensionsreform",            // 14.–15. Feb. 2026
+    "wohnkosten",                // 12.–13. Feb. 2026
+    "bildung",                   // 10.–11. Feb. 2026
+    "digitalsteuer",             // 7.–8. Feb. 2026
   ];
 
-  // Demo-Themen als Fallback (alle 14)
-  const demoKeys = Object.keys(DEMO_DATA);
-  let demoIndex = 0;
+  const labels = ["heute","gestern","vorgestern","tag4","tag5","tag6","tag7",
+                   "tag8","tag9","tag10","tag11","tag12","tag13","tag14","tag15"];
 
-  let cardIndex = 0;
-  slots.forEach(function (slot) {
-    if (slot.topic) {
-      grid.appendChild(createTopicCard(slot.topic, cardIndex++, slot.isToday, slot.label));
-    } else {
-      // Demo-Thema als Platzhalter
-      const demoKey = demoKeys[demoIndex % demoKeys.length];
-      demoIndex++;
-      if (DEMO_DATA[demoKey]) {
-        grid.appendChild(createTopicCard(DEMO_DATA[demoKey], cardIndex++, false, "Demo"));
-      }
-    }
+  // Alle 15 Slots befüllen – echte Daten oder Demo
+  const alle = labels.map(function(label, i) {
+    return { topic: data[label] || null, label: label, index: i };
   });
+
+  let demoIndex = 0;
+  const befuellt = alle.map(function(slot) {
+    if (slot.topic) return slot;
+    const demoKey = demoKeys[demoIndex % demoKeys.length];
+    demoIndex++;
+    return { topic: DEMO_DATA[demoKey] || null, label: "demo", index: slot.index };
+  });
+
+  // Heute (Slot 0) → today-grid, volle Breite
+  if (befuellt[0] && befuellt[0].topic) {
+    const isReal = alle[0].topic !== null;
+    todayGrid.appendChild(createTopicCard(befuellt[0].topic, 0, true, isReal ? "● Heute" : "● Demo"));
+  }
+
+  // Gestern / Vorgestern / Vor 3 Tagen (Slots 1–3) → recent-grid
+  const dayLabels = ["Gestern", "Vorgestern", "Vor 3 Tagen"];
+  befuellt.slice(1, 4).forEach(function(slot, i) {
+    if (!slot.topic) return;
+    const isReal = alle[i+1].topic !== null;
+    const label  = isReal ? dayLabels[i] : "Demo";
+    recentGrid.appendChild(createTopicCard(slot.topic, i, false, label));
+  });
+
+  // Rest (Slots 4–14) → archive-grid
+  befuellt.slice(4).forEach(function(slot, i) {
+    if (!slot.topic) return;
+    const isReal = alle[i+4].topic !== null;
+    const label  = isReal ? `Vor ${i+4} Tagen` : "Demo";
+    archiveGrid.appendChild(createTopicCard(slot.topic, i, false, label));
+  });
+}
+
+function toggleArchive() {
+  const grid   = document.getElementById("topic-archive-grid");
+  const text   = document.getElementById("archive-toggle-text");
+  const icon   = document.getElementById("archive-toggle-icon");
+  if (!grid) return;
+  const open = grid.classList.toggle("hidden");
+  text.textContent = open ? "Ältere Themen anzeigen" : "Ältere Themen ausblenden";
+  icon.textContent = open ? "↓" : "↑";
 }
 
 /* ---------------------------------------------------------
@@ -145,15 +181,37 @@ function showLoadingFull(visible) {
    renderHomepageTopics: 3 Themenkarten auf der Startseite
    --------------------------------------------------------- */
 function renderHomepageTopics() {
-  const grid = document.getElementById("topic-cards-grid");
-  if (!grid) return;
-  grid.innerHTML = "";
+  const demoKeys = [
+    "eu-kunststoffverpackungen", "frauentag", "co2-steuer", "erbschaftssteuer",
+    "naher-osten", "spritpreise", "energiepreise-nahost", "inflation",
+    "gletscher", "sicherheitspolitik", "pensionsreform", "wohnkosten",
+    "bildung", "digitalsteuer"
+  ];
 
-  const demoKeys = Object.keys(DEMO_DATA);
-  // Zeige alle 14 Demo-Themen (für 15 Slots)
-  demoKeys.slice(0, 15).forEach(function (key, i) {
-    const topic = DEMO_DATA[key];
-    if (topic) grid.appendChild(createTopicCard(topic, i, i === 0, i === 0 ? "Demo" : "Demo"));
+  const todayGrid   = document.getElementById("topic-today-grid");
+  const recentGrid  = document.getElementById("topic-recent-grid");
+  const archiveGrid = document.getElementById("topic-archive-grid");
+  if (!todayGrid) return;
+
+  todayGrid.innerHTML = "";
+  if (recentGrid)  recentGrid.innerHTML = "";
+  if (archiveGrid) archiveGrid.innerHTML = "";
+
+  // Heute
+  if (DEMO_DATA[demoKeys[0]]) {
+    todayGrid.appendChild(createTopicCard(DEMO_DATA[demoKeys[0]], 0, true, "● Demo"));
+  }
+  // Letzte 3 Tage
+  demoKeys.slice(1, 4).forEach(function(key, i) {
+    if (DEMO_DATA[key] && recentGrid) {
+      recentGrid.appendChild(createTopicCard(DEMO_DATA[key], i, false, "Demo"));
+    }
+  });
+  // Archiv
+  demoKeys.slice(4).forEach(function(key, i) {
+    if (DEMO_DATA[key] && archiveGrid) {
+      archiveGrid.appendChild(createTopicCard(DEMO_DATA[key], i, false, "Demo"));
+    }
   });
 }
 
