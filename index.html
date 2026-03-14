@@ -44,46 +44,9 @@
       </div>
     </div>
   </header>
-
-  <!-- ===== SUCHBEREICH ===== -->
-  <section class="search-section" id="search">
-    <div class="container">
-      <div class="search-card">
-        <div class="search-inner">
-          <label for="topic-input" class="search-label">Thema analysieren</label>
-          <div class="search-row">
-            <input
-              type="text"
-              id="topic-input"
-              class="search-input"
-              placeholder="Thema oder politische Maßnahme eingeben …"
-              autocomplete="off"
-            />
-            <button id="search-btn" class="search-btn" onclick="handleSearch()">
-              <span class="btn-text">Vergleich starten</span>
-              <span class="btn-icon" aria-hidden="true">→</span>
-            </button>
-          </div>
-          <div class="search-meta">
-            <span class="meta-tag">
-              <span class="meta-dot"></span>
-              Verglichene Medien: ORF · Standard · Presse · Krone · Heute · oe24 · exxpress
-            </span>
-            <span class="meta-tag">
-              <span class="meta-dot meta-dot--time"></span>
-              Standard-Zeitraum: letzte 30&nbsp;Tage
-            </span>
-          </div>
-          <div class="quick-topics">
-            <span class="quick-label">Schnellauswahl:</span>
-            <button class="quick-btn" onclick="quickSearch('EU-Kunststoffverpackungen')">Kunststoffverpackungen</button>
-            <button class="quick-btn" onclick="quickSearch('CO2-Steuer')">CO2-Steuer</button>
-            <button class="quick-btn" onclick="quickSearch('Erbschaftssteuer')">Erbschaftssteuer</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- Verstecktes Input-Feld für JS-Kompatibilität -->
+  <input type="text" id="topic-input" style="display:none;" />
+  <button id="search-btn" style="display:none;"><span class="btn-text">Vergleich starten</span></button>
 
   <!-- ===== LOADING INDICATOR ===== -->
   <div id="loading-overlay" class="loading-overlay hidden" aria-live="polite">
@@ -100,9 +63,9 @@
     <section class="homepage-topics">
       <div class="container">
         <div class="section-header">
-          <div class="section-label">Aktuelle Themen</div>
-          <h2 class="section-title">Diese Themen sind gerade aktuell</h2>
-          <p class="section-subtitle">Klicke auf ein Thema, um die Medienanalyse zu starten.</p>
+          <div class="section-label">Thema des Tages</div>
+          <h2 class="section-title">Was Österreich heute bewegt</h2>
+          <p class="section-subtitle">Täglich aktuell – wie berichten Österreichs Medien über das wichtigste Thema?</p>
         </div>
         <div class="topic-cards-grid" id="topic-cards-grid"></div>
       </div>
