@@ -80,38 +80,43 @@ async function loadTagesanalyse() {
 function renderHomepageWithTagesanalyse(data) {
   const grid = document.getElementById("topic-cards-grid");
   if (!grid) return;
-
   grid.innerHTML = "";
 
   const slots = [
-    { topic: data.heute,      label: "● Heute",        isToday: true  },
-    { topic: data.gestern,    label: "Gestern",         isToday: false },
-    { topic: data.vorgestern, label: "Vorgestern",      isToday: false },
-    { topic: data.tag4,       label: "Vor 3 Tagen",     isToday: false },
-    { topic: data.tag5,       label: "Vor 4 Tagen",     isToday: false },
+    { topic: data.heute,      label: "● Heute",      isToday: true  },
+    { topic: data.gestern,    label: "Gestern",       isToday: false },
+    { topic: data.vorgestern, label: "Vorgestern",    isToday: false },
+    { topic: data.tag4,       label: "Vor 3 Tagen",   isToday: false },
+    { topic: data.tag5,       label: "Vor 4 Tagen",   isToday: false },
+    { topic: data.tag6,       label: "Vor 5 Tagen",   isToday: false },
+    { topic: data.tag7,       label: "Vor 6 Tagen",   isToday: false },
+    { topic: data.tag8,       label: "Vor 7 Tagen",   isToday: false },
+    { topic: data.tag9,       label: "Vor 8 Tagen",   isToday: false },
+    { topic: data.tag10,      label: "Vor 9 Tagen",   isToday: false },
+    { topic: data.tag11,      label: "Vor 10 Tagen",  isToday: false },
+    { topic: data.tag12,      label: "Vor 11 Tagen",  isToday: false },
+    { topic: data.tag13,      label: "Vor 12 Tagen",  isToday: false },
+    { topic: data.tag14,      label: "Vor 13 Tagen",  isToday: false },
+    { topic: data.tag15,      label: "Vor 14 Tagen",  isToday: false },
   ];
 
-  // Nur vorhandene Slots anzeigen
-  const vorhandene = slots.filter(s => s.topic);
+  // Demo-Themen als Fallback (alle 14)
+  const demoKeys = Object.keys(DEMO_DATA);
+  let demoIndex = 0;
 
-  // Fallback: mit Demo-Themen auffüllen bis 5 Karten
-  const demos = [
-    DEMO_DATA["eu-kunststoffverpackungen"],
-    DEMO_DATA["co2-steuer"],
-    DEMO_DATA["erbschaftssteuer"]
-  ];
-
-  let index = 0;
-  vorhandene.forEach(function (slot) {
-    grid.appendChild(createTopicCard(slot.topic, index++, slot.isToday, slot.label));
+  let cardIndex = 0;
+  slots.forEach(function (slot) {
+    if (slot.topic) {
+      grid.appendChild(createTopicCard(slot.topic, cardIndex++, slot.isToday, slot.label));
+    } else {
+      // Demo-Thema als Platzhalter
+      const demoKey = demoKeys[demoIndex % demoKeys.length];
+      demoIndex++;
+      if (DEMO_DATA[demoKey]) {
+        grid.appendChild(createTopicCard(DEMO_DATA[demoKey], cardIndex++, false, "Demo"));
+      }
+    }
   });
-
-  // Demo-Themen auffüllen wenn weniger als 5 echte Themen
-  if (vorhandene.length < 5) {
-    demos.slice(0, 5 - vorhandene.length).forEach(function (topic) {
-      if (topic) grid.appendChild(createTopicCard(topic, index++, false, "Demo"));
-    });
-  }
 }
 
 /* ---------------------------------------------------------
@@ -142,17 +147,13 @@ function showLoadingFull(visible) {
 function renderHomepageTopics() {
   const grid = document.getElementById("topic-cards-grid");
   if (!grid) return;
-
-  const topics = [
-    DEMO_DATA["eu-kunststoffverpackungen"],
-    DEMO_DATA["co2-steuer"],
-    DEMO_DATA["erbschaftssteuer"]
-  ].filter(Boolean);
-
   grid.innerHTML = "";
-  topics.forEach(function (topic, i) {
-    const card = createTopicCard(topic, i);
-    grid.appendChild(card);
+
+  const demoKeys = Object.keys(DEMO_DATA);
+  // Zeige alle 14 Demo-Themen (für 15 Slots)
+  demoKeys.slice(0, 15).forEach(function (key, i) {
+    const topic = DEMO_DATA[key];
+    if (topic) grid.appendChild(createTopicCard(topic, i, i === 0, i === 0 ? "Demo" : "Demo"));
   });
 }
 
@@ -660,9 +661,10 @@ function createMediaCard(item, index) {
         ${item.focus ? `<span class="media-tag-badge media-tag-badge--focus">${escapeHtml(item.focus)}</span>` : ""}
         ${item.stil  ? `<span class="media-tag-badge">${escapeHtml(item.stil)}</span>` : ""}
       </div>
-      ${Array.isArray(item.haltung) && item.haltung.length > 0 ? `
-      <div class="media-haltung">
-        ${item.haltung.map(h => `<span class="haltung-tag haltung-tag--${escapeHtml(h)}">${escapeHtml(haltungLabel(h))}</span>`).join("")}
+      ${item.compass ? `
+      <div class="media-compass">
+        <span class="compass-tag compass-tag--wirtschaft compass-tag--${escapeHtml(item.compass.wirtschaft || 'mitte')}">💰 ${compassLabel('wirtschaft', item.compass.wirtschaft)}</span>
+        <span class="compass-tag compass-tag--gesellschaft compass-tag--${escapeHtml(item.compass.gesellschaft || 'mitte')}">🏛️ ${compassLabel('gesellschaft', item.compass.gesellschaft)}</span>
       </div>` : ""}
     </div>
   `;
@@ -769,19 +771,17 @@ function stanceLabel(haltung) {
   return map[haltung] || haltung || "";
 }
 
-/* Hilfsfunktion: Haltungs-Tag Label */
-function haltungLabel(haltung) {
-  const map = {
-    "ausgewogen":            "⚖️ Ausgewogen",
-    "regierungskritisch":    "🔴 Regierungskritisch",
-    "regierungsfreundlich":  "🟢 Regierungsfreundlich",
-    "emotionalisierend":     "🔥 Emotionalisierend",
-    "faktenorientiert":      "📊 Faktenorientiert",
-    "bueroperspektive":      "👥 Bürgerperspektive",
-    "wirtschaftsperspektive":"🏢 Wirtschaftsperspektive",
-    "alarmistisch":          "⚠️ Alarmistisch",
-  };
-  return map[haltung] || haltung;
+/* Hilfsfunktion: Political Compass Label */
+function compassLabel(achse, wert) {
+  if (achse === 'wirtschaft') {
+    const map = { "konservativ": "Konservativ", "liberal": "Liberal", "mitte": "Mitte" };
+    return map[wert] || wert || "Mitte";
+  }
+  if (achse === 'gesellschaft') {
+    const map = { "autoritaer": "Autoritär", "libertaer": "Libertär", "mitte": "Mitte" };
+    return map[wert] || wert || "Mitte";
+  }
+  return wert || "";
 }
 
 /* ---------------------------------------------------------
