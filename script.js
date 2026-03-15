@@ -740,27 +740,22 @@ function createMediaCard(item, index) {
       </div>
       ${item.compass ? `
       <div class="media-compass">
-        <span class="compass-tag compass-tag--wirtschaft compass-tag--${escapeHtml(item.compass.wirtschaft || 'mitte')}">💰 ${compassLabel('wirtschaft', item.compass.wirtschaft)}</span>
-        <span class="compass-tag compass-tag--gesellschaft compass-tag--${escapeHtml(item.compass.gesellschaft || 'mitte')}">🏛️ ${compassLabel('gesellschaft', item.compass.gesellschaft)}</span>
         ${item.compass.ausrichtung ? `<span class="compass-tag compass-tag--ausrichtung">🧭 ${compassLabel('ausrichtung', item.compass.ausrichtung)}</span>` : ""}
         ${item.compass.neutralitaet ? `<span class="compass-tag compass-tag--neutralitaet compass-tag--neu-${escapeHtml(item.compass.neutralitaet)}">● ${compassLabel('neutralitaet', item.compass.neutralitaet)}</span>` : ""}
-        <span class="compass-info-btn" onclick="event.preventDefault(); event.stopPropagation();" aria-label="Political Compass erklären">ⓘ
+        <span class="compass-info-btn" onclick="event.preventDefault(); event.stopPropagation();" aria-label="Medieneinordnung erklären">ⓘ
           <span class="compass-tooltip">
-            <strong>Political Compass</strong><br><br>
-            <em>Wirtschaftsachse:</em><br>
-            💰 Konservativ: Bewahrung bewährter Strukturen, nationale Identität<br>
-            💰 Liberal: Offene Gesellschaft, individuelle Rechte, internationale Vernetzung<br>
-            💰 Mitte: Ausgewogen, pragmatisch<br><br>
-            <em>Gesellschaftsachse:</em><br>
-            🏛️ Autoritär: Starker Staat, kollektive Sicherheit über persönliche Freiheit<br>
-            🏛️ Libertär: Maximale individuelle Freiheit, minimaler Staatseingriff<br>
-            🏛️ Mitte: Ausgewogen, pragmatisch<br><br>
+            <strong>Medieneinordnung</strong><br><br>
             <em>Politische Ausrichtung:</em><br>
-            🧭 Linksautoritär / Liberal-konservativ / Libertär-konservativ / Opportunistisch / Regierungsnah<br><br>
+            🧭 Linksautoritär: Progressiv in gesellschaftlichen Fragen, befürwortet staatliche Eingriffe und Regulierung<br>
+            🧭 Liberal-konservativ: Wirtschaftsliberal, gesellschaftlich traditionell orientiert<br>
+            🧭 Libertär-konservativ: Wirtschaftsliberal, gesellschaftlich freiheitlich, EU-skeptisch<br>
+            🧭 Opportunistisch: Politische Haltung wechselt je nach Eigentümerinteresse und Machtlage<br>
+            🧭 Regierungsnah: Tendenzielle Nähe zur jeweils regierenden Partei<br><br>
             <em>Neutralität:</em><br>
-            ● Hoch: ausgewogene Berichterstattung<br>
-            ● Mittel: erkennbare Tendenz<br>
-            ● Gering: klare redaktionelle Linie<br><br>
+            ● Hoch: Ausgewogene Berichterstattung, verschiedene Perspektiven gleichwertig<br>
+            ● Mittel: Erkennbare redaktionelle Tendenz, aber grundsätzlich faktenbasiert<br>
+            ● Mäßig: Klare redaktionelle Linie, selektive Themensetzung<br>
+            ● Gering: Starke redaktionelle Haltung, einseitige Berichterstattung<br><br>
             <em>Die Einordnung spiegelt die generelle redaktionelle Linie des Mediums wider.</em>
           </span>
         </span>
