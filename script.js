@@ -742,6 +742,20 @@ function createMediaCard(item, index) {
       <div class="media-compass">
         <span class="compass-tag compass-tag--wirtschaft compass-tag--${escapeHtml(item.compass.wirtschaft || 'mitte')}">💰 ${compassLabel('wirtschaft', item.compass.wirtschaft)}</span>
         <span class="compass-tag compass-tag--gesellschaft compass-tag--${escapeHtml(item.compass.gesellschaft || 'mitte')}">🏛️ ${compassLabel('gesellschaft', item.compass.gesellschaft)}</span>
+        <span class="compass-info-btn" onclick="event.preventDefault(); event.stopPropagation();" aria-label="Political Compass erklären">ⓘ
+          <span class="compass-tooltip">
+            <strong>Political Compass</strong><br><br>
+            <em>Wirtschaftsachse:</em><br>
+            💰 Konservativ: Bewahrung bewährter Strukturen, nationale Identität<br>
+            💰 Liberal: Offene Gesellschaft, individuelle Rechte, internationale Vernetzung<br>
+            💰 Mitte: Ausgewogen, pragmatisch<br><br>
+            <em>Gesellschaftsachse:</em><br>
+            🏛️ Autoritär: Starker Staat, kollektive Sicherheit über persönliche Freiheit<br>
+            🏛️ Libertär: Maximale individuelle Freiheit, minimaler Staatseingriff<br>
+            🏛️ Mitte: Ausgewogen, pragmatisch<br><br>
+            <em>Die Einordnung spiegelt die generelle redaktionelle Linie des Mediums wider.</em>
+          </span>
+        </span>
       </div>` : ""}
     </div>
   `;
