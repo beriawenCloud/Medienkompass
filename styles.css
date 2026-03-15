@@ -1750,6 +1750,25 @@ button { cursor: pointer; font-family: inherit; }
   line-height: 1.7;
 }
 
+.footer-contact {
+  margin-top: var(--spacing-md);
+}
+
+.footer-contact p {
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.4);
+}
+
+.footer-contact a {
+  color: rgba(255,255,255,0.6);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.footer-contact a:hover {
+  color: rgba(255,255,255,0.9);
+}
+
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.08);
   padding-top: var(--spacing-md);
