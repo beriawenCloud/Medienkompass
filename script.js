@@ -709,18 +709,20 @@ function renderMediaCards(mediaItems) {
    createMediaCard: Erstellt eine einzelne Medienkarte
    --------------------------------------------------------- */
 function createMediaCard(item, index) {
-  // Karte als <a>-Element wenn URL vorhanden, sonst <div>
-  const card = document.createElement(item.url ? "a" : "div");
+  // Karte als <a>-Element wenn echter Artikel gefunden, sonst <div>
+  const card = document.createElement(item.found && item.url ? "a" : "div");
   card.className = "media-card medium--" + (item.slug || "default") + " animate-in";
   card.style.animationDelay = (index * 0.06) + "s";
   card.style.opacity = "0";
 
-  if (item.url) {
+  if (item.found && item.url) {
     card.href   = item.url;
     card.target = "_blank";
     card.rel    = "noopener noreferrer";
     card.setAttribute("aria-label", `${item.medium}: ${item.headline} – im neuen Tab öffnen`);
   }
+
+  const searchUrl = item.searchUrl || "#";
 
   card.innerHTML = `
     <div class="media-card-top"></div>
@@ -729,7 +731,7 @@ function createMediaCard(item, index) {
         <span class="media-name">${escapeHtml(item.medium || "")}</span>
         <div class="media-name-right">
           <span class="media-date">${escapeHtml(item.date || "")}</span>
-          ${item.url ? `<span class="media-link-icon" aria-hidden="true" title="Beim Medium suchen">🔍</span>` : ""}
+          <a href="${escapeHtml(searchUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="media-link-icon" aria-hidden="true" title="Beim Medium suchen">🔍</a>
         </div>
       </div>
       <p class="media-headline">${escapeHtml(item.headline || "")}</p>
