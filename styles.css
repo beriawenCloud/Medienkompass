@@ -1082,6 +1082,15 @@ button { cursor: pointer; font-family: inherit; }
 .compass-tag--autoritaer  { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
 .compass-tag--libertaer   { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
 
+/* Politische Ausrichtung */
+.compass-tag--ausrichtung { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
+
+/* Neutralität */
+.compass-tag--neu-hoch   { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+.compass-tag--neu-mittel { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.compass-tag--neu-maessig{ background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+.compass-tag--neu-gering { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+
 /* Medium-Farben: Card-Top (farbiger Balken oben) */
 .medium--orf      .media-card-top { background: var(--color-orf); }
 .medium--standard .media-card-top { background: var(--color-standard); }

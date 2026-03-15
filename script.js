@@ -742,6 +742,8 @@ function createMediaCard(item, index) {
       <div class="media-compass">
         <span class="compass-tag compass-tag--wirtschaft compass-tag--${escapeHtml(item.compass.wirtschaft || 'mitte')}">💰 ${compassLabel('wirtschaft', item.compass.wirtschaft)}</span>
         <span class="compass-tag compass-tag--gesellschaft compass-tag--${escapeHtml(item.compass.gesellschaft || 'mitte')}">🏛️ ${compassLabel('gesellschaft', item.compass.gesellschaft)}</span>
+        ${item.compass.ausrichtung ? `<span class="compass-tag compass-tag--ausrichtung">🧭 ${compassLabel('ausrichtung', item.compass.ausrichtung)}</span>` : ""}
+        ${item.compass.neutralitaet ? `<span class="compass-tag compass-tag--neutralitaet compass-tag--neu-${escapeHtml(item.compass.neutralitaet)}">● ${compassLabel('neutralitaet', item.compass.neutralitaet)}</span>` : ""}
         <span class="compass-info-btn" onclick="event.preventDefault(); event.stopPropagation();" aria-label="Political Compass erklären">ⓘ
           <span class="compass-tooltip">
             <strong>Political Compass</strong><br><br>
@@ -753,6 +755,12 @@ function createMediaCard(item, index) {
             🏛️ Autoritär: Starker Staat, kollektive Sicherheit über persönliche Freiheit<br>
             🏛️ Libertär: Maximale individuelle Freiheit, minimaler Staatseingriff<br>
             🏛️ Mitte: Ausgewogen, pragmatisch<br><br>
+            <em>Politische Ausrichtung:</em><br>
+            🧭 Linksautoritär / Liberal-konservativ / Libertär-konservativ / Opportunistisch / Regierungsnah<br><br>
+            <em>Neutralität:</em><br>
+            ● Hoch: ausgewogene Berichterstattung<br>
+            ● Mittel: erkennbare Tendenz<br>
+            ● Gering: klare redaktionelle Linie<br><br>
             <em>Die Einordnung spiegelt die generelle redaktionelle Linie des Mediums wider.</em>
           </span>
         </span>
@@ -872,6 +880,20 @@ function compassLabel(achse, wert) {
   if (achse === 'gesellschaft') {
     const map = { "autoritaer": "Autoritär", "libertaer": "Libertär", "mitte": "Mitte" };
     return map[wert] || wert || "Mitte";
+  }
+  if (achse === 'ausrichtung') {
+    const map = {
+      "linksautoritaer": "Linksautoritär",
+      "liberal-konservativ": "Liberal-konservativ",
+      "libertaer-konservativ": "Libertär-konservativ",
+      "opportunistisch": "Opportunistisch",
+      "regierungsnah": "Regierungsnah"
+    };
+    return map[wert] || wert || "";
+  }
+  if (achse === 'neutralitaet') {
+    const map = { "hoch": "Neutralität: hoch", "mittel": "Neutralität: mittel", "maessig": "Neutralität: mäßig", "gering": "Neutralität: gering" };
+    return map[wert] || wert || "";
   }
   return wert || "";
 }
