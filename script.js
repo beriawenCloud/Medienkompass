@@ -226,9 +226,15 @@ function showLoadingFull(visible) {
 }
 
 /* ---------------------------------------------------------
-   renderHomepageTopics: Fallback mit Demo-Daten
+   renderHomepageTopics: Fallback – im Live-Modus Platzhalter, sonst Demo-Daten
    --------------------------------------------------------- */
 function renderHomepageTopics() {
+  // Im Live-Modus keine DEMO_DATA verwenden
+  if (CONFIG.useWorker && CONFIG.workerUrl) {
+    renderHomepageNoData();
+    return;
+  }
+
   const demoKeys = [
     "eu-kunststoffverpackungen", "frauentag", "co2-steuer", "erbschaftssteuer",
     "naher-osten", "spritpreise", "energiepreise-nahost", "inflation",
@@ -246,18 +252,18 @@ function renderHomepageTopics() {
   if (archiveGrid) archiveGrid.innerHTML = "";
 
   // Heute
-  if (DEMO_DATA[demoKeys[0]]) {
+  if (typeof DEMO_DATA !== "undefined" && DEMO_DATA[demoKeys[0]]) {
     todayGrid.appendChild(createTopicCard(DEMO_DATA[demoKeys[0]], 0, true, "● Demo"));
   }
   // Letzte 3 Tage
   demoKeys.slice(1, 4).forEach(function(key, i) {
-    if (DEMO_DATA[key] && recentGrid) {
+    if (typeof DEMO_DATA !== "undefined" && DEMO_DATA[key] && recentGrid) {
       recentGrid.appendChild(createTopicCard(DEMO_DATA[key], i, false, "Demo"));
     }
   });
   // Archiv
   demoKeys.slice(4).forEach(function(key, i) {
-    if (DEMO_DATA[key] && archiveGrid) {
+    if (typeof DEMO_DATA !== "undefined" && DEMO_DATA[key] && archiveGrid) {
       archiveGrid.appendChild(createTopicCard(DEMO_DATA[key], i, false, "Demo"));
     }
   });
@@ -388,6 +394,7 @@ function renderTopicOfTheWeek() {
 
   if (!weekSection || !weekCardsEl) return;
 
+  if (typeof DEMO_DATA === "undefined" || typeof WEEK_TOPIC_KEY === "undefined") return;
   const topicData = DEMO_DATA[WEEK_TOPIC_KEY];
   if (!topicData) return;
 
@@ -442,9 +449,9 @@ function handleSearch() {
   if (CONFIG.useWorker && CONFIG.workerUrl) {
     searchTopicWithGemini(rawTopic);
   } else {
-    // Demo-Modus
+    // Demo-Modus (nur wenn DEMO_DATA verfügbar)
     setTimeout(function () {
-      const topicData = getDemoTopicData(rawTopic);
+      const topicData = typeof getDemoTopicData === "function" ? getDemoTopicData(rawTopic) : null;
       if (topicData) {
         renderTopic(topicData);
       } else {
@@ -698,9 +705,11 @@ function renderTopic(topicData, scrollToResults = true, label = "Analyse") {
   }
 
   renderTopicHeader(topicData, label);
-  renderMediaCards(topicData.media || []);
+  const safeMedia = Array.isArray(topicData.media) ? topicData.media : [];
+  renderMediaCards(safeMedia);
   renderMeaningSection(topicData);
-  renderQuestions(topicData.fragen || DEFAULT_QUESTIONS);
+  const defaultQ = typeof DEFAULT_QUESTIONS !== "undefined" ? DEFAULT_QUESTIONS : [];
+  renderQuestions(topicData.fragen || defaultQ);
 }
 
 /* ---------------------------------------------------------
