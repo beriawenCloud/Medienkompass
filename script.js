@@ -225,49 +225,7 @@ function showLoadingFull(visible) {
   // (Kein sichtbarer Ladeindikator nötig)
 }
 
-/* ---------------------------------------------------------
-   renderHomepageTopics: Fallback – im Live-Modus Platzhalter, sonst Demo-Daten
-   --------------------------------------------------------- */
-function renderHomepageTopics() {
-  // Im Live-Modus keine DEMO_DATA verwenden
-  if (CONFIG.useWorker && CONFIG.workerUrl) {
-    renderHomepageNoData();
-    return;
-  }
-
-  const demoKeys = [
-    "eu-kunststoffverpackungen", "frauentag", "co2-steuer", "erbschaftssteuer",
-    "naher-osten", "spritpreise", "energiepreise-nahost", "inflation",
-    "gletscher", "sicherheitspolitik", "pensionsreform", "wohnkosten",
-    "bildung", "digitalsteuer"
-  ];
-
-  const todayGrid   = document.getElementById("topic-today-grid");
-  const recentGrid  = document.getElementById("topic-recent-grid");
-  const archiveGrid = document.getElementById("topic-archive-grid");
-  if (!todayGrid) return;
-
-  todayGrid.innerHTML = "";
-  if (recentGrid)  recentGrid.innerHTML = "";
-  if (archiveGrid) archiveGrid.innerHTML = "";
-
-  // Heute
-  if (typeof DEMO_DATA !== "undefined" && DEMO_DATA[demoKeys[0]]) {
-    todayGrid.appendChild(createTopicCard(DEMO_DATA[demoKeys[0]], 0, true, "● Demo"));
-  }
-  // Letzte 3 Tage
-  demoKeys.slice(1, 4).forEach(function(key, i) {
-    if (typeof DEMO_DATA !== "undefined" && DEMO_DATA[key] && recentGrid) {
-      recentGrid.appendChild(createTopicCard(DEMO_DATA[key], i, false, "Demo"));
-    }
-  });
-  // Archiv
-  demoKeys.slice(4).forEach(function(key, i) {
-    if (typeof DEMO_DATA !== "undefined" && DEMO_DATA[key] && archiveGrid) {
-      archiveGrid.appendChild(createTopicCard(DEMO_DATA[key], i, false, "Demo"));
-    }
-  });
-}
+/* renderHomepageTopics: Demo-Version entfernt – Live-Betrieb verwendet Platzhalter */
 
 /* ---------------------------------------------------------
    createTopicCard: Eine Themenkarte für die Startseite
@@ -343,15 +301,8 @@ function handleResearch() {
   if (CONFIG.useWorker && CONFIG.workerUrl) {
     searchTopicWithGemini(rawTopic);
   } else {
-    setTimeout(function () {
-      const demoData = getDemoTopicData(rawTopic);
-      if (demoData) {
-        renderTopic(demoData, true, "Analyse");
-      } else {
-        renderNoResults(rawTopic);
-      }
-      showLoading(false);
-    }, CONFIG.searchDelay);
+    renderNoResults(rawTopic);
+    showLoading(false);
   }
 }
 
@@ -389,21 +340,7 @@ function setupSearchListeners() {
    THEMA DER WOCHE (Startseite)
    ========================================================= */
 function renderTopicOfTheWeek() {
-  const weekSection = DOM.topicOfWeek();
-  const weekCardsEl = DOM.weekCards();
-
-  if (!weekSection || !weekCardsEl) return;
-
-  if (typeof DEMO_DATA === "undefined" || typeof WEEK_TOPIC_KEY === "undefined") return;
-  const topicData = DEMO_DATA[WEEK_TOPIC_KEY];
-  if (!topicData) return;
-
-  // Nur die ersten 7 Medien (alle 7) als Schnellkarten
-  weekCardsEl.innerHTML = "";
-  (topicData.media || []).forEach(function (item) {
-    const card = createWeekCard(item);
-    weekCardsEl.appendChild(card);
-  });
+  /* Demo-Modus deaktiviert im Live-Betrieb */
 }
 
 /* ---------------------------------------------------------
@@ -449,9 +386,9 @@ function handleSearch() {
   if (CONFIG.useWorker && CONFIG.workerUrl) {
     searchTopicWithGemini(rawTopic);
   } else {
-    // Demo-Modus (nur wenn DEMO_DATA verfügbar)
+    // Demo-Modus
     setTimeout(function () {
-      const topicData = typeof getDemoTopicData === "function" ? getDemoTopicData(rawTopic) : null;
+      const topicData = getDemoTopicData(rawTopic);
       if (topicData) {
         renderTopic(topicData);
       } else {
@@ -481,37 +418,7 @@ function quickSearch(keyword) {
    getDemoTopicData: Sucht passendes Thema in Demo-Daten
    --------------------------------------------------------- */
 function getDemoTopicData(rawTopic) {
-  const normalized = rawTopic.toLowerCase().trim();
-
-  // 1. Direkte Schlüssel-Suche
-  if (DEMO_DATA[normalized]) {
-    return DEMO_DATA[normalized];
-  }
-
-  // 2. Keyword-Map
-  if (KEYWORD_MAP[normalized]) {
-    const key = KEYWORD_MAP[normalized];
-    return DEMO_DATA[key] || null;
-  }
-
-  // 3. Teilstring-Suche in Keywords
-  for (const [keyword, key] of Object.entries(KEYWORD_MAP)) {
-    if (normalized.includes(keyword) || keyword.includes(normalized)) {
-      return DEMO_DATA[key] || null;
-    }
-  }
-
-  // 4. Teilstring in Titel oder Keywords der Themen
-  for (const [, topicData] of Object.entries(DEMO_DATA)) {
-    const titleMatch = topicData.title.toLowerCase().includes(normalized);
-    const keywordMatch = topicData.keywords.some(function (kw) {
-      return kw.toLowerCase().includes(normalized) || normalized.includes(kw.toLowerCase());
-    });
-    if (titleMatch || keywordMatch) {
-      return topicData;
-    }
-  }
-
+  /* Demo-Daten deaktiviert im Live-Betrieb */
   return null;
 }
 
@@ -565,13 +472,7 @@ async function searchTopicWithGemini(topic) {
 
   } catch (err) {
     console.error("[Medienkompass] Worker/Gemini Fehler:", err);
-    const demoData = getDemoTopicData(topic);
-    if (demoData) {
-      console.warn("[Medienkompass] Fallback auf Demo-Daten.");
-      renderTopic(demoData, true, "Analyse (Demo-Fallback)");
-    } else {
-      renderNoResults(topic);
-    }
+    renderNoResults(topic);
   } finally {
     showLoading(false);
   }
@@ -705,11 +606,9 @@ function renderTopic(topicData, scrollToResults = true, label = "Analyse") {
   }
 
   renderTopicHeader(topicData, label);
-  const safeMedia = Array.isArray(topicData.media) ? topicData.media : [];
-  renderMediaCards(safeMedia);
+  renderMediaCards(topicData.media || []);
   renderMeaningSection(topicData);
-  const defaultQ = typeof DEFAULT_QUESTIONS !== "undefined" ? DEFAULT_QUESTIONS : [];
-  renderQuestions(topicData.fragen || defaultQ);
+  renderQuestions(topicData.fragen || DEFAULT_QUESTIONS);
 }
 
 /* ---------------------------------------------------------
@@ -931,11 +830,6 @@ function renderMeaningSection(topicData) {
 function stanceLabel(haltung) {
   const map = { "dafuer": "Dafür", "dagegen": "Dagegen", "gespalten": "Gespalten", "neutral": "Neutral", "abwartend": "Abwartend" };
   return map[haltung] || haltung || "";
-}
-
-/* Alias für Kompatibilität */
-function haltungLabel(haltung) {
-  return stanceLabel(haltung);
 }
 
 /* Hilfsfunktion: Political Compass Label */
