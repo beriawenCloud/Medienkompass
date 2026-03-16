@@ -393,7 +393,7 @@ function renderTopicOfTheWeek() {
 
   // Nur die ersten 7 Medien (alle 7) als Schnellkarten
   weekCardsEl.innerHTML = "";
-  topicData.media.forEach(function (item) {
+  (topicData.media || []).forEach(function (item) {
     const card = createWeekCard(item);
     weekCardsEl.appendChild(card);
   });
@@ -922,6 +922,11 @@ function renderMeaningSection(topicData) {
 function stanceLabel(haltung) {
   const map = { "dafuer": "Dafür", "dagegen": "Dagegen", "gespalten": "Gespalten", "neutral": "Neutral", "abwartend": "Abwartend" };
   return map[haltung] || haltung || "";
+}
+
+/* Alias für Kompatibilität */
+function haltungLabel(haltung) {
+  return stanceLabel(haltung);
 }
 
 /* Hilfsfunktion: Political Compass Label */
