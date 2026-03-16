@@ -51,45 +51,41 @@ function triggerAnimations() {
   document.querySelectorAll(".animate-in").forEach(function(el) {
     el.style.opacity = "1";
     el.style.transform = "none";
+    el.style.transition = "none";
   });
 }
 
 /* ---------------------------------------------------------
    loadTagesanalyse: Lädt das Tagesthema vom Worker (gecacht).
-   Nur 1 API-Anfrage pro Tag – danach aus KV-Cache bedient.
    --------------------------------------------------------- */
 async function loadTagesanalyse() {
   if (CONFIG.useWorker && CONFIG.workerUrl) {
     try {
-      const loadingText = document.getElementById("loading-text");
-      if (loadingText) loadingText.textContent = "Tagesthema wird geladen …";
-      showLoadingFull(true);
-
       const response = await fetch(CONFIG.workerUrl + "/tagesanalyse");
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
       console.log("[Medienkompass] Antwort /tagesanalyse:", data);
-
       if (data.error) throw new Error(data.error);
 
       // Robuster Zugriff: heute → gestern → vorgestern
       const analyse = data.heute || data.gestern || data.vorgestern;
+      console.log("[Medienkompass] Analyse gewählt:", analyse ? analyse.title : "keine");
+
       if (!analyse) {
-        console.warn("[Medienkompass] Keine Analyse im Cache verfügbar.");
-        showLoadingFull(false);
+        console.warn("[Medienkompass] Keine Analyse im Cache.");
         renderHomepageNoData();
         return;
       }
 
-      showLoadingFull(false);
+      const media = Array.isArray(analyse.media) ? analyse.media : [];
+      console.log("[Medienkompass] Media-Länge:", media.length);
+
       renderHomepageWithTagesanalyse(data);
-      // Fallback: sicherstellen dass alle Karten sichtbar sind
-      setTimeout(triggerAnimations, 100);
+      setTimeout(triggerAnimations, 150);
 
     } catch (err) {
-      console.error("[Medienkompass] Fehler beim Laden des Medienkompass:", err);
-      showLoadingFull(false);
+      console.error("[Medienkompass] Fehler:", err);
       renderHomepageTopics();
     }
   } else {
@@ -105,7 +101,7 @@ function renderHomepageWithTagesanalyse(data) {
   const todayGrid   = document.getElementById("topic-today-grid");
   const recentGrid  = document.getElementById("topic-recent-grid");
   const archiveGrid = document.getElementById("topic-archive-grid");
-  if (!todayGrid) return;
+  if (!todayGrid) { console.error("[Medienkompass] topic-today-grid nicht gefunden!"); return; }
 
   todayGrid.innerHTML = "";
   if (recentGrid)  recentGrid.innerHTML = "";
@@ -880,7 +876,7 @@ function renderQuestions(questions) {
 
   container.innerHTML = questionsArray.map(function (q, i) {
     return `
-      <div class="question-card animate-in" style="animation-delay:${i * 0.07}s; opacity:0;">
+      <div class="question-card animate-in" style="animation-delay:${i * 0.07}s;">
         <span class="question-number">${String(i + 1).padStart(2, "0")}</span>
         <p class="question-text">${escapeHtml(q)}</p>
       </div>
