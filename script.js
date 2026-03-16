@@ -56,18 +56,19 @@ async function loadTagesanalyse() {
       showLoadingFull(true);
 
       const response = await fetch(CONFIG.workerUrl + "/tagesanalyse");
-      if (!response.ok) throw new Error("Worker antwortet nicht.");
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
+      console.log("[Medienkompass] Antwort /tagesanalyse:", data);
+
       if (data.error) throw new Error(data.error);
 
-      // Robuster Zugriff: heute → gestern → Meldung
+      // Robuster Zugriff: heute → gestern → vorgestern
       const analyse = data.heute || data.gestern || data.vorgestern;
       if (!analyse) {
         console.warn("[Medienkompass] Keine Analyse im Cache verfügbar.");
         showLoadingFull(false);
         renderHomepageNoData();
-        renderHomepageWithTagesanalyse(data);
         return;
       }
 
@@ -75,7 +76,7 @@ async function loadTagesanalyse() {
       renderHomepageWithTagesanalyse(data);
 
     } catch (err) {
-      console.warn("[Medienkompass] Tagesthema nicht verfügbar:", err.message);
+      console.error("[Medienkompass] Fehler beim Laden des Medienkompass:", err);
       showLoadingFull(false);
       renderHomepageTopics();
     }
