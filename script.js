@@ -61,6 +61,16 @@ async function loadTagesanalyse() {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
+      // Robuster Zugriff: heute → gestern → Meldung
+      const analyse = data.heute || data.gestern || data.vorgestern;
+      if (!analyse) {
+        console.warn("[Medienkompass] Keine Analyse im Cache verfügbar.");
+        showLoadingFull(false);
+        renderHomepageNoData();
+        renderHomepageWithTagesanalyse(data);
+        return;
+      }
+
       showLoadingFull(false);
       renderHomepageWithTagesanalyse(data);
 
@@ -165,6 +175,23 @@ function createPlaceholderCard(index, dayLabel) {
   return card;
 }
 
+function renderHomepageNoData() {
+  const todayGrid = document.getElementById("topic-today-grid");
+  if (!todayGrid) return;
+  todayGrid.innerHTML = `
+    <div class="topic-card topic-card--placeholder animate-in" style="opacity:1;">
+      <div class="topic-card-body topic-card-body--placeholder">
+        <div class="topic-card-meta">
+          <span class="topic-card-date">–</span>
+          <span class="topic-card-today-badge">● Heute</span>
+        </div>
+        <div class="placeholder-icon">📰</div>
+        <p class="placeholder-text">Noch kein Tagesthema verfügbar. Bitte später nochmal vorbeischauen.</p>
+      </div>
+    </div>
+  `;
+}
+
 function toggleArchive() {
   const grid = document.getElementById("topic-archive-grid");
   const text = document.getElementById("archive-toggle-text");
@@ -198,7 +225,7 @@ function showLoadingFull(visible) {
 }
 
 /* ---------------------------------------------------------
-   renderHomepageTopics: 3 Themenkarten auf der Startseite
+   renderHomepageTopics: Fallback mit Demo-Daten
    --------------------------------------------------------- */
 function renderHomepageTopics() {
   const demoKeys = [
@@ -709,13 +736,17 @@ function renderMediaCards(mediaItems) {
    createMediaCard: Erstellt eine einzelne Medienkarte
    --------------------------------------------------------- */
 function createMediaCard(item, index) {
-  // Karte als <a>-Element wenn echter Artikel gefunden, sonst <div>
-  const card = document.createElement(item.found && item.url ? "a" : "div");
+  // Karte als <a>-Element wenn URL vorhanden und nicht nur Suchseite
+  // Unterstützt sowohl found-Feld (Gemini-Pfad) als auch webhook-Format (ohne found)
+  const hasRealUrl = item.url && item.url.startsWith("http") &&
+    item.found !== false &&
+    !item.headline?.includes("Kein aktueller Artikel");
+  const card = document.createElement(hasRealUrl ? "a" : "div");
   card.className = "media-card medium--" + (item.slug || "default") + " animate-in";
   card.style.animationDelay = (index * 0.06) + "s";
   card.style.opacity = "0";
 
-  if (item.found && item.url) {
+  if (hasRealUrl) {
     card.href   = item.url;
     card.target = "_blank";
     card.rel    = "noopener noreferrer";
@@ -781,6 +812,10 @@ function renderMeaningSection(topicData) {
   const intVergleich      = topicData.internationalerVergleich || [];
   const zeitHorizont      = topicData.zeitlicherHorizont || { kurzfristig: [], mittelfristig: [], langfristig: [] };
   const politik           = topicData.politik           || [];
+  // Neue Felder vom Webhook-Pfad
+  const commonFrames   = topicData.commonFrames  || [];
+  const explicitFacts  = topicData.explicitFacts || [];
+  const offeneFragen   = topicData.offeneFragen  || [];
 
   container.innerHTML = `
 
@@ -858,6 +893,26 @@ function renderMeaningSection(topicData) {
         </div>
       </div>
     </div>
+
+  ${commonFrames.length > 0 ? `
+    <!-- Gemeinsame Frames (Webhook-Analyse) -->
+    <div class="meaning-card animate-in meaning-card--full" style="animation-delay:0.42s;">
+      <div class="meaning-card-icon">🔍</div>
+      <h3 class="meaning-card-title">Gemeinsame Deutungsrahmen</h3>
+      <ul class="meaning-list">
+        ${commonFrames.map(f => `<li>${escapeHtml(f)}</li>`).join("")}
+      </ul>
+    </div>` : ""}
+
+  ${explicitFacts.length > 0 ? `
+    <!-- Explizite Fakten (Webhook-Analyse) -->
+    <div class="meaning-card meaning-card--facts animate-in meaning-card--full" style="animation-delay:0.49s;">
+      <div class="meaning-card-icon">📌</div>
+      <h3 class="meaning-card-title">Belegte Fakten aus den Artikeln</h3>
+      <ul class="meaning-list meaning-list--facts">
+        ${explicitFacts.map(f => `<li><span class="fact-value">${escapeHtml(f.wert || "")}</span><span class="fact-label">${escapeHtml(f.label || "")}${f.sourceMedium ? " <em>(" + escapeHtml(f.sourceMedium) + ")</em>" : ""}</span></li>`).join("")}
+      </ul>
+    </div>` : ""}
 
   `;
 }
