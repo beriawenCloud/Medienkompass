@@ -45,6 +45,16 @@ function initApp() {
 }
 
 /* ---------------------------------------------------------
+   triggerAnimations: Fallback – macht alle animate-in Elemente sichtbar
+   --------------------------------------------------------- */
+function triggerAnimations() {
+  document.querySelectorAll(".animate-in").forEach(function(el) {
+    el.style.opacity = "1";
+    el.style.transform = "none";
+  });
+}
+
+/* ---------------------------------------------------------
    loadTagesanalyse: Lädt das Tagesthema vom Worker (gecacht).
    Nur 1 API-Anfrage pro Tag – danach aus KV-Cache bedient.
    --------------------------------------------------------- */
@@ -74,6 +84,8 @@ async function loadTagesanalyse() {
 
       showLoadingFull(false);
       renderHomepageWithTagesanalyse(data);
+      // Fallback: sicherstellen dass alle Karten sichtbar sind
+      setTimeout(triggerAnimations, 100);
 
     } catch (err) {
       console.error("[Medienkompass] Fehler beim Laden des Medienkompass:", err);
@@ -89,6 +101,7 @@ async function loadTagesanalyse() {
    renderHomepageWithTagesanalyse: Heute / Gestern / Vorgestern
    --------------------------------------------------------- */
 function renderHomepageWithTagesanalyse(data) {
+  if (!data || typeof data !== "object") return;
   const todayGrid   = document.getElementById("topic-today-grid");
   const recentGrid  = document.getElementById("topic-recent-grid");
   const archiveGrid = document.getElementById("topic-archive-grid");
@@ -158,7 +171,6 @@ function createPlaceholderCard(index, dayLabel) {
   const card = document.createElement("div");
   card.className = "topic-card topic-card--placeholder animate-in";
   card.style.animationDelay = (index * 0.05) + "s";
-  card.style.opacity = "0";
 
   const isToday = dayLabel && dayLabel.includes("Heute");
   const badgeClass = isToday ? "topic-card-today-badge" : "topic-card-day-badge";
@@ -234,7 +246,6 @@ function createTopicCard(topic, index, isToday = false, dayLabel = null) {
   const card = document.createElement("div");
   card.className = "topic-card animate-in" + (isToday ? " topic-card--today" : "");
   card.style.animationDelay = (index * 0.1) + "s";
-  card.style.opacity = "0";
 
   const mediaBadges = (topic.media || []).slice(0, 3).map(function (m) {
     const color = getMediumColor(m.slug);
@@ -653,7 +664,6 @@ function createMediaCard(item, index) {
   const card = document.createElement(hasRealUrl ? "a" : "div");
   card.className = "media-card medium--" + (item.slug || "default") + " animate-in";
   card.style.animationDelay = (index * 0.06) + "s";
-  card.style.opacity = "0";
 
   if (hasRealUrl) {
     card.href   = item.url;
