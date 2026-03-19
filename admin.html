@@ -451,26 +451,6 @@
     </div>
     <div id="artikel-container"></div>
 
-    <!-- MANUELL ARTIKEL HINZUFÜGEN -->
-    <div style="margin-top:1.5rem; padding:1rem; background:var(--surface2); border-radius:var(--radius); border:1px solid var(--border);">
-      <div class="card-title" style="margin-bottom:0.75rem;">Artikel manuell hinzufügen</div>
-      <div style="display:grid; grid-template-columns:1fr 2fr 2fr auto; gap:0.5rem; align-items:center;">
-        <select id="manual-medium" style="background:var(--bg); border:1px solid var(--border2); border-radius:6px; padding:0.6rem 0.75rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.85rem;">
-          <option value="">Medium wählen</option>
-          <option value="ORF">ORF</option>
-          <option value="Der Standard">Der Standard</option>
-          <option value="Die Presse">Die Presse</option>
-          <option value="Kronen Zeitung">Kronen Zeitung</option>
-          <option value="Kurier">Kurier</option>
-          <option value="exxpress">exxpress</option>
-        </select>
-        <input type="text" id="manual-link" placeholder="https://..." style="margin-bottom:0;" />
-        <input type="text" id="manual-title" placeholder="Titel (optional)" style="margin-bottom:0;" />
-        <button class="btn" style="width:auto; padding:0.6rem 1rem; white-space:nowrap;" onclick="addManualArtikel()">+ Hinzufügen</button>
-      </div>
-      <p id="manual-error" style="color:var(--accent2); font-size:0.8rem; margin-top:0.5rem; display:none;"></p>
-    </div>
-
     <div style="margin-top:1rem;">
       <button class="btn" id="publish-btn" onclick="publishArtikel()">Ausgewählte Artikel analysieren & veröffentlichen</button>
       <div class="status-bar" id="publish-status">
@@ -651,58 +631,118 @@ async function startWorkflow() {
 }
 
 // ARTIKEL RENDERN
+const ALLE_MEDIEN = [
+  { medium: "ORF"            },
+  { medium: "Der Standard"   },
+  { medium: "Die Presse"     },
+  { medium: "Kronen Zeitung" },
+  { medium: "Kurier"         },
+  { medium: "exxpress"       },
+];
+
 function renderArtikel(artikel) {
   const container = document.getElementById("artikel-container");
   container.innerHTML = "";
 
-  // Nach Medium gruppieren
   const byMedium = {};
   artikel.forEach((a, i) => {
     if (!byMedium[a.medium]) byMedium[a.medium] = [];
     byMedium[a.medium].push({ ...a, index: i });
   });
 
-  if (Object.keys(byMedium).length === 0) {
-    container.innerHTML = '<div class="no-articles">Keine Artikel verfügbar.</div>';
-    return;
-  }
+  ALLE_MEDIEN.forEach(({ medium }) => {
+    const items = byMedium[medium] || [];
+    const color = MEDIUM_COLORS[medium] || "#666";
 
-  Object.entries(byMedium).forEach(([medium, items]) => {
     const section = document.createElement("div");
     section.className = "medium-section";
-
-    const color = MEDIUM_COLORS[medium] || "#666";
+    section.dataset.medium = medium;
     section.innerHTML = `
-      <div class="medium-label">
-        <span class="medium-badge" style="background:${color};">${medium}</span>
-        ${items.length} Artikel
+      <div class="medium-label" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="medium-badge" style="background:${color};">${escapeHtml(medium)}</span>
+          <span>${items.length} Artikel</span>
+        </div>
+        <button class="btn-sm" id="addbtn-${medium.replace(/\s+/g,'-')}" onclick="toggleManualForm('${medium.replace(/'/g,"\\'").replace(/\s+/g,'-')}')">+ Hinzufügen</button>
       </div>
-      <div class="artikel-grid" id="grid-${medium.replace(/\s+/g,'-')}"></div>
+      <div class="manual-form" id="form-${medium.replace(/\s+/g,'-')}" style="display:none; margin-bottom:0.75rem; background:var(--surface2); border-radius:6px; padding:0.75rem;">
+        <div style="display:grid; grid-template-columns:2fr 2fr auto; gap:0.5rem; align-items:center;">
+          <input type="text" placeholder="https://..." class="manual-link-input" style="margin-bottom:0;" />
+          <input type="text" placeholder="Titel (optional)" class="manual-title-input" style="margin-bottom:0;" />
+          <button class="btn-sm primary" onclick="addManualForMedium('${medium.replace(/'/g,"\\'").replace(/\s+/g,'-')}', '${medium.replace(/'/g,"\\'")}', this)">Hinzufügen</button>
+        </div>
+        <p class="manual-err" style="color:var(--accent2);font-size:0.78rem;margin-top:0.4rem;display:none;"></p>
+      </div>
+      <div class="artikel-grid" id="grid-${medium.replace(/\s+/g,'-')}">
+        ${items.length === 0 ? `<div class="no-articles-hint" style="color:var(--muted);font-size:0.82rem;padding:0.5rem 0;">Keine Artikel gefunden</div>` : ""}
+      </div>
     `;
-
     container.appendChild(section);
 
     const grid = section.querySelector(".artikel-grid");
-    items.forEach(a => {
-      const item = document.createElement("div");
-      item.className = "artikel-item selected";
-      item.dataset.index = a.index;
-      item.innerHTML = `
-        <div class="artikel-checkbox"></div>
-        <div class="artikel-info">
-          <div class="artikel-title">${escapeHtml(a.title)}</div>
-          <div class="artikel-meta">${formatDate(a.pubDate)}</div>
-          <a class="artikel-link" href="${escapeHtml(a.link)}" target="_blank" onclick="event.stopPropagation();">${escapeHtml(a.link)}</a>
-        </div>
-      `;
-      item.addEventListener("click", () => toggleArtikel(a.index, item));
-      grid.appendChild(item);
-    });
+    items.forEach(a => grid.appendChild(createArtikelItem(a.index, a)));
   });
 
   document.getElementById("card-artikel").style.display = "block";
   updateCount();
   document.getElementById("card-artikel").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function createArtikelItem(index, a) {
+  const item = document.createElement("div");
+  item.className = "artikel-item selected";
+  item.dataset.index = index;
+  item.innerHTML = `
+    <div class="artikel-checkbox"></div>
+    <div class="artikel-info">
+      <div class="artikel-title">${escapeHtml(a.title || a.link)}</div>
+      <div class="artikel-meta">${a.manuell ? "Manuell hinzugefügt" : formatDate(a.pubDate)}</div>
+      <a class="artikel-link" href="${escapeHtml(a.link)}" target="_blank" onclick="event.stopPropagation();">${escapeHtml(a.link)}</a>
+    </div>
+  `;
+  item.addEventListener("click", () => toggleArtikel(index, item));
+  return item;
+}
+
+function toggleManualForm(mediumId) {
+  const form = document.getElementById("form-" + mediumId);
+  if (form) form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+function addManualForMedium(mediumId, medium, btn) {
+  const form = btn.closest(".manual-form");
+  const link  = form.querySelector(".manual-link-input").value.trim();
+  const title = form.querySelector(".manual-title-input").value.trim();
+  const err   = form.querySelector(".manual-err");
+
+  if (!link || !link.startsWith("http")) {
+    err.textContent = "Bitte gültigen Link eingeben.";
+    err.style.display = "block";
+    return;
+  }
+  err.style.display = "none";
+
+  const thema = document.getElementById("thema-input").value.trim() || "Manuell";
+  const index = alleArtikel.length;
+
+  alleArtikel.push({ link, medium, title: title || link, pubDate: new Date().toISOString(), thema, thema_key: thema.toLowerCase(), manuell: true });
+  ausgewaehlteArtikel.add(index);
+
+  const grid = document.getElementById("grid-" + mediumId);
+  const hint = grid.querySelector(".no-articles-hint");
+  if (hint) hint.remove();
+  grid.appendChild(createArtikelItem(index, alleArtikel[index]));
+
+  form.querySelector(".manual-link-input").value = "";
+  form.querySelector(".manual-title-input").value = "";
+
+  const manualCount = alleArtikel.filter(a => a.medium === medium && a.manuell).length;
+  if (manualCount >= 2) {
+    const addBtn = document.getElementById("addbtn-" + mediumId);
+    if (addBtn) addBtn.style.display = "none";
+    form.style.display = "none";
+  }
+  updateCount();
 }
 
 function toggleArtikel(index, el) {
@@ -777,73 +817,6 @@ async function publishArtikel() {
     statusText.textContent = "Fehler: " + err.message;
     btn.disabled = false;
   }
-}
-
-function addManualArtikel() {
-  const medium = document.getElementById("manual-medium").value;
-  const link   = document.getElementById("manual-link").value.trim();
-  const title  = document.getElementById("manual-title").value.trim();
-  const error  = document.getElementById("manual-error");
-
-  if (!medium) { error.textContent = "Bitte Medium auswählen."; error.style.display = "block"; return; }
-  if (!link || !link.startsWith("http")) { error.textContent = "Bitte gültigen Link eingeben."; error.style.display = "block"; return; }
-  error.style.display = "none";
-
-  const thema = document.getElementById("thema-input").value.trim() || "Manuell";
-  const index = alleArtikel.length;
-
-  alleArtikel.push({
-    link,
-    medium,
-    title:  title || link,
-    pubDate: new Date().toISOString(),
-    thema,
-    thema_key: thema.toLowerCase(),
-  });
-
-  ausgewaehlteArtikel.add(index);
-
-  // Artikel in Grid einfügen
-  const container = document.getElementById("artikel-container");
-  const color = MEDIUM_COLORS[medium] || "#666";
-
-  // Prüfen ob Medium-Section schon existiert
-  let grid = container.querySelector(`[data-medium="${medium}"] .artikel-grid`);
-  if (!grid) {
-    const section = document.createElement("div");
-    section.className = "medium-section";
-    section.dataset.medium = medium;
-    section.innerHTML = `
-      <div class="medium-label">
-        <span class="medium-badge" style="background:${color};">${escapeHtml(medium)}</span>
-        Manuell hinzugefügt
-      </div>
-      <div class="artikel-grid"></div>
-    `;
-    container.appendChild(section);
-    grid = section.querySelector(".artikel-grid");
-  }
-
-  const item = document.createElement("div");
-  item.className = "artikel-item selected";
-  item.dataset.index = index;
-  item.innerHTML = `
-    <div class="artikel-checkbox"></div>
-    <div class="artikel-info">
-      <div class="artikel-title">${escapeHtml(title || link)}</div>
-      <div class="artikel-meta">Manuell hinzugefügt</div>
-      <a class="artikel-link" href="${escapeHtml(link)}" target="_blank" onclick="event.stopPropagation();">${escapeHtml(link)}</a>
-    </div>
-  `;
-  item.addEventListener("click", () => toggleArtikel(index, item));
-  grid.appendChild(item);
-
-  // Felder leeren
-  document.getElementById("manual-medium").value = "";
-  document.getElementById("manual-link").value = "";
-  document.getElementById("manual-title").value = "";
-
-  updateCount();
 }
 
 function resetAdmin() {
