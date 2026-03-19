@@ -107,11 +107,10 @@ function renderHomepageWithTagesanalyse(data) {
   if (recentGrid)  recentGrid.innerHTML = "";
   if (archiveGrid) archiveGrid.innerHTML = "";
 
-  const labels = ["heute","gestern","vorgestern","tag4","tag5","tag6","tag7",
-                  "tag8","tag9","tag10","tag11","tag12","tag13","tag14","tag15"];
-  const dayLabels = ["● Heute","Gestern","Vorgestern","Vor 3 Tagen","Vor 4 Tagen",
-                     "Vor 5 Tagen","Vor 6 Tagen","Vor 7 Tagen","Vor 8 Tagen","Vor 9 Tagen",
-                     "Vor 10 Tagen","Vor 11 Tagen","Vor 12 Tagen","Vor 13 Tagen","Vor 14 Tagen"];
+  const labels = ["heute","gestern","vorgestern",
+                  ...Array.from({length: 57}, (_, i) => `tag${i+4}`)];
+  const dayLabels = ["● Heute","Gestern","Vorgestern",
+                  ...Array.from({length: 57}, (_, i) => `Vor ${i+3} Tagen`)];
 
   // Heute → today-grid
   const heuteTopic = data[labels[0]];
@@ -158,7 +157,7 @@ function renderHomepageTopics() {
   recentLabels.forEach(function(label, i) {
     recentGrid.appendChild(createPlaceholderCard(i, label));
   });
-  for (let i = 4; i < 15; i++) {
+  for (let i = 4; i < 60; i++) {
     archiveGrid.appendChild(createPlaceholderCard(i - 4, `Vor ${i} Tagen`));
   }
 }
