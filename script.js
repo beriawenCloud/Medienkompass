@@ -775,13 +775,14 @@ function renderMeaningSection(topicData) {
       </ul>
     </div>
 
+  ${intVergleich.length > 0 ? `
     <div class="meaning-card meaning-card--international animate-in" style="animation-delay:0.28s;">
       <div class="meaning-card-icon">🌍</div>
       <h3 class="meaning-card-title">Internationaler Vergleich</h3>
       <ul class="meaning-list">
         ${intVergleich.map(f => `<li>${escapeHtml(f)}</li>`).join("")}
       </ul>
-    </div>
+    </div>` : ""}
 
     <!-- Zeile 4: Zeitlicher Horizont – volle Breite -->
   ${(zeitHorizont.kurzfristig?.length > 0 || zeitHorizont.mittelfristig?.length > 0 || zeitHorizont.langfristig?.length > 0) ? `
