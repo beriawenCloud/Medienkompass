@@ -1370,6 +1370,14 @@ button { cursor: pointer; font-family: inherit; }
 .politics-stance--gespalten { background: #fef3c7; color: #92400e; }
 .politics-stance--abwartend { background: #dbeafe; color: #1e40af; }
 .politics-stance--neutral   { background: var(--color-surface-2); color: var(--color-text-muted); }
+.politics-stance--unbekannt { background: var(--color-surface-2); color: var(--color-text-muted); }
+
+.politics-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 
 .politics-text {
   font-size: 0.83rem;
@@ -1377,6 +1385,65 @@ button { cursor: pointer; font-family: inherit; }
   line-height: 1.5;
   margin-top: 0.2rem;
 }
+
+.politics-text--programm {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.politics-text--aktuell {
+  font-size: 0.8rem;
+  color: var(--color-text-body);
+  line-height: 1.5;
+  margin-top: 0.2rem;
+}
+
+.politics-text--abweichung {
+  font-size: 0.78rem;
+  color: #92400e;
+  background: #fef3c7;
+  border-left: 3px solid #f59e0b;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-top: 0.35rem;
+  line-height: 1.5;
+}
+
+/* Parteien in Medienkarten */
+.media-parteien {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.media-parteien-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-right: 0.1rem;
+}
+
+.media-partei-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.media-partei-badge--positiv { background: #d1fae5; color: #065f46; }
+.media-partei-badge--negativ { background: #fee2e2; color: #991b1b; }
+.media-partei-badge--neutral { background: var(--color-surface-2); color: var(--color-text-muted); }
 
 .meaning-card-icon {
   font-size: 1.6rem;
