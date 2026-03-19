@@ -607,14 +607,12 @@ async function startWorkflow() {
     }));
 
     if (artikel.length === 0) {
-      statusBar.className = "status-bar error";
-      statusText.textContent = "Keine Artikel gefunden. Bitte Thema anpassen.";
-      btn.disabled = false;
-      return;
+      statusBar.className = "status-bar loading";
+      statusText.textContent = "Keine Artikel gefunden – du kannst trotzdem manuell Artikel hinzufügen!";
+    } else {
+      statusBar.className = "status-bar success";
+      statusText.textContent = `${artikel.length} Artikel gefunden!`;
     }
-
-    statusBar.className = "status-bar success";
-    statusText.textContent = `${artikel.length} Artikel gefunden!`;
 
     alleArtikel = artikel;
     ausgewaehlteArtikel = new Set(artikel.map((_, i) => i));
