@@ -450,6 +450,27 @@
       </div>
     </div>
     <div id="artikel-container"></div>
+
+    <!-- MANUELL ARTIKEL HINZUFÜGEN -->
+    <div style="margin-top:1.5rem; padding:1rem; background:var(--surface2); border-radius:var(--radius); border:1px solid var(--border);">
+      <div class="card-title" style="margin-bottom:0.75rem;">Artikel manuell hinzufügen</div>
+      <div style="display:grid; grid-template-columns:1fr 2fr 2fr auto; gap:0.5rem; align-items:center;">
+        <select id="manual-medium" style="background:var(--bg); border:1px solid var(--border2); border-radius:6px; padding:0.6rem 0.75rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.85rem;">
+          <option value="">Medium wählen</option>
+          <option value="ORF">ORF</option>
+          <option value="Der Standard">Der Standard</option>
+          <option value="Die Presse">Die Presse</option>
+          <option value="Kronen Zeitung">Kronen Zeitung</option>
+          <option value="Kurier">Kurier</option>
+          <option value="exxpress">exxpress</option>
+        </select>
+        <input type="text" id="manual-link" placeholder="https://..." style="margin-bottom:0;" />
+        <input type="text" id="manual-title" placeholder="Titel (optional)" style="margin-bottom:0;" />
+        <button class="btn" style="width:auto; padding:0.6rem 1rem; white-space:nowrap;" onclick="addManualArtikel()">+ Hinzufügen</button>
+      </div>
+      <p id="manual-error" style="color:var(--accent2); font-size:0.8rem; margin-top:0.5rem; display:none;"></p>
+    </div>
+
     <div style="margin-top:1rem;">
       <button class="btn" id="publish-btn" onclick="publishArtikel()">Ausgewählte Artikel analysieren & veröffentlichen</button>
       <div class="status-bar" id="publish-status">
@@ -756,6 +777,73 @@ async function publishArtikel() {
     statusText.textContent = "Fehler: " + err.message;
     btn.disabled = false;
   }
+}
+
+function addManualArtikel() {
+  const medium = document.getElementById("manual-medium").value;
+  const link   = document.getElementById("manual-link").value.trim();
+  const title  = document.getElementById("manual-title").value.trim();
+  const error  = document.getElementById("manual-error");
+
+  if (!medium) { error.textContent = "Bitte Medium auswählen."; error.style.display = "block"; return; }
+  if (!link || !link.startsWith("http")) { error.textContent = "Bitte gültigen Link eingeben."; error.style.display = "block"; return; }
+  error.style.display = "none";
+
+  const thema = document.getElementById("thema-input").value.trim() || "Manuell";
+  const index = alleArtikel.length;
+
+  alleArtikel.push({
+    link,
+    medium,
+    title:  title || link,
+    pubDate: new Date().toISOString(),
+    thema,
+    thema_key: thema.toLowerCase(),
+  });
+
+  ausgewaehlteArtikel.add(index);
+
+  // Artikel in Grid einfügen
+  const container = document.getElementById("artikel-container");
+  const color = MEDIUM_COLORS[medium] || "#666";
+
+  // Prüfen ob Medium-Section schon existiert
+  let grid = container.querySelector(`[data-medium="${medium}"] .artikel-grid`);
+  if (!grid) {
+    const section = document.createElement("div");
+    section.className = "medium-section";
+    section.dataset.medium = medium;
+    section.innerHTML = `
+      <div class="medium-label">
+        <span class="medium-badge" style="background:${color};">${escapeHtml(medium)}</span>
+        Manuell hinzugefügt
+      </div>
+      <div class="artikel-grid"></div>
+    `;
+    container.appendChild(section);
+    grid = section.querySelector(".artikel-grid");
+  }
+
+  const item = document.createElement("div");
+  item.className = "artikel-item selected";
+  item.dataset.index = index;
+  item.innerHTML = `
+    <div class="artikel-checkbox"></div>
+    <div class="artikel-info">
+      <div class="artikel-title">${escapeHtml(title || link)}</div>
+      <div class="artikel-meta">Manuell hinzugefügt</div>
+      <a class="artikel-link" href="${escapeHtml(link)}" target="_blank" onclick="event.stopPropagation();">${escapeHtml(link)}</a>
+    </div>
+  `;
+  item.addEventListener("click", () => toggleArtikel(index, item));
+  grid.appendChild(item);
+
+  // Felder leeren
+  document.getElementById("manual-medium").value = "";
+  document.getElementById("manual-link").value = "";
+  document.getElementById("manual-title").value = "";
+
+  updateCount();
 }
 
 function resetAdmin() {
