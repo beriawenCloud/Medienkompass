@@ -573,6 +573,8 @@ async function startWorkflow() {
     let artikel = [];
     if (Array.isArray(data)) {
       artikel = data;
+    } else if (data.data && Array.isArray(data.data)) {
+      artikel = data.data;
     } else if (Array.isArray(data.articles)) {
       artikel = data.articles;
     } else if (data.body && Array.isArray(data.body)) {
