@@ -681,32 +681,17 @@ function createMediaCard(item, index) {
         </div>
       </div>
       <p class="media-headline">${escapeHtml(item.headline || "")}</p>
-      ${item.excerpt ? `<p class="media-excerpt">${escapeHtml(item.excerpt)}</p>` : ""}
+      ${item.schwerpunkt ? `<p class="media-excerpt"><strong>Schwerpunkt:</strong> ${escapeHtml(item.schwerpunkt)}</p>` : (item.excerpt ? `<p class="media-excerpt">${escapeHtml(item.excerpt)}</p>` : "")}
+      ${item.tonalitaet ? `<p class="media-excerpt"><strong>Tonalität:</strong> ${escapeHtml(item.tonalitaet)}</p>` : ""}
+      ${item.betonteAspekte && item.betonteAspekte.length > 0 ? `<p class="media-excerpt"><strong>Betonte Aspekte:</strong> ${item.betonteAspekte.map(a => escapeHtml(a)).join(" · ")}</p>` : ""}
+      ${item.fazit ? `<p class="media-excerpt"><strong>Fazit:</strong> ${escapeHtml(item.fazit)}</p>` : ""}
       <div class="media-tags">
-        ${item.focus ? `<span class="media-tag-badge media-tag-badge--focus">${escapeHtml(item.focus)}</span>` : ""}
-        ${item.stil  ? `<span class="media-tag-badge">${escapeHtml(item.stil)}</span>` : ""}
+        ${item.stil ? `<span class="media-tag-badge">${escapeHtml(item.stil)}</span>` : ""}
       </div>
-      ${item.compass ? `
-      <div class="media-compass">
-        ${item.compass.ausrichtung ? `<span class="compass-tag compass-tag--ausrichtung">🧭 ${compassLabel('ausrichtung', item.compass.ausrichtung)}</span>` : ""}
-        ${item.compass.neutralitaet ? `<span class="compass-tag compass-tag--neutralitaet compass-tag--neu-${escapeHtml(item.compass.neutralitaet)}">● ${compassLabel('neutralitaet', item.compass.neutralitaet)}</span>` : ""}
-        <span class="compass-info-btn" onclick="event.preventDefault(); event.stopPropagation();" aria-label="Medieneinordnung erklären">ⓘ
-          <span class="compass-tooltip">
-            <strong>Medieneinordnung</strong><br><br>
-            <em>Politische Ausrichtung:</em><br>
-            🧭 Linksautoritär: Progressiv in gesellschaftlichen Fragen, befürwortet staatliche Eingriffe und Regulierung<br>
-            🧭 Liberal-konservativ: Wirtschaftsliberal, gesellschaftlich traditionell orientiert<br>
-            🧭 Libertär-konservativ: Wirtschaftsliberal, gesellschaftlich freiheitlich, EU-skeptisch<br>
-            🧭 Opportunistisch: Politische Haltung wechselt je nach Eigentümerinteresse und Machtlage<br>
-            🧭 Regierungsnah: Tendenzielle Nähe zur jeweils regierenden Partei<br><br>
-            <em>Neutralität:</em><br>
-            ● Hoch: Ausgewogene Berichterstattung, verschiedene Perspektiven gleichwertig<br>
-            ● Mittel: Erkennbare redaktionelle Tendenz, aber grundsätzlich faktenbasiert<br>
-            ● Mäßig: Klare redaktionelle Linie, selektive Themensetzung<br>
-            ● Gering: Starke redaktionelle Haltung, einseitige Berichterstattung<br><br>
-            <em>Die Einordnung spiegelt die generelle redaktionelle Linie des Mediums wider.</em>
-          </span>
-        </span>
+      ${item.parteien && item.parteien.length > 0 ? `
+      <div class="media-parteien">
+        <span class="media-parteien-label">Parteien:</span>
+        ${item.parteien.map(p => `<span class="media-partei-badge media-partei-badge--${escapeHtml(p.sentiment || "neutral")}">${escapeHtml(p.name || "")} ${sentimentIcon(p.sentiment)}</span>`).join("")}
       </div>` : ""}
     </div>
   `;
@@ -731,6 +716,7 @@ function renderMeaningSection(topicData) {
   const commonFrames   = topicData.commonFrames  || [];
   const explicitFacts  = topicData.explicitFacts || [];
   const offeneFragen   = topicData.offeneFragen  || [];
+  const parteienNeu    = topicData.parteien      || [];
 
   container.innerHTML = `
 
@@ -739,7 +725,17 @@ function renderMeaningSection(topicData) {
       <div class="meaning-card-icon">🏛️</div>
       <h3 class="meaning-card-title">Was sagen die Parteien?</h3>
       <div class="politics-grid">
-        ${politik.map(p => `
+        ${parteienNeu.length > 0 ? parteienNeu.map(p => `
+          <div class="politics-item">
+            <div class="politics-item-header">
+              <span class="politics-party">${escapeHtml(p.partei || "")}</span>
+              <span class="politics-stance politics-stance--${escapeHtml(p.haltung || "neutral")}">${escapeHtml(stanceLabel(p.haltung))}</span>
+            </div>
+            ${p.programmPosition ? `<p class="politics-text politics-text--programm"><em>📋 Parteiprogramm:</em> ${escapeHtml(p.programmPosition)}</p>` : ""}
+            ${p.aktuellePosition ? `<p class="politics-text politics-text--aktuell"><em>🗣️ Aktuell:</em> ${escapeHtml(p.aktuellePosition)}</p>` : ""}
+            ${p.abweichung && p.abweichungsBeschreibung ? `<p class="politics-text politics-text--abweichung">⚠️ <strong>Abweichung:</strong> ${escapeHtml(p.abweichungsBeschreibung)}</p>` : ""}
+          </div>
+        `).join("") : politik.map(p => `
           <div class="politics-item">
             <span class="politics-party">${escapeHtml(p.partei || "")}</span>
             <span class="politics-stance politics-stance--${escapeHtml(p.haltung || "neutral")}">${escapeHtml(stanceLabel(p.haltung))}</span>
@@ -836,8 +832,15 @@ function renderMeaningSection(topicData) {
 
 /* Hilfsfunktion: Haltungs-Label */
 function stanceLabel(haltung) {
-  const map = { "dafuer": "Dafür", "dagegen": "Dagegen", "gespalten": "Gespalten", "neutral": "Neutral", "abwartend": "Abwartend" };
+  const map = { "dafuer": "Dafür", "dagegen": "Dagegen", "gespalten": "Gespalten", "neutral": "Neutral", "abwartend": "Abwartend", "unbekannt": "Unbekannt" };
   return map[haltung] || haltung || "";
+}
+
+/* Hilfsfunktion: Sentiment-Icon für Parteien in Medienkarten */
+function sentimentIcon(sentiment) {
+  if (sentiment === "positiv")  return "↑";
+  if (sentiment === "negativ")  return "↓";
+  return "–";
 }
 
 /* Hilfsfunktion: Political Compass Label */
@@ -989,7 +992,7 @@ function getMediumColor(slug) {
     "standard": "#0e3a6e",
     "presse":   "#1a1a1a",
     "krone":    "#d4001a",
-    "heute":    "#ff6600",
+    "kurier":   "#e2001a",
     "exxpress": "#222222"
   };
   return colors[slug] || "#6b7280";
