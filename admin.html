@@ -451,6 +451,13 @@
     </div>
     <div id="artikel-container"></div>
 
+    <!-- PARTEIMEINUNGEN -->
+    <div style="margin-top:1.5rem; padding:1rem; background:var(--surface2); border-radius:var(--radius); border:1px solid var(--border);">
+      <div class="card-title" style="margin-bottom:0.5rem;">Parteimeinungen ergänzen <span style="font-weight:400;color:var(--muted);font-size:0.75rem;">(optional)</span></div>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem;">Falls du aktuelle Parteipositionen kennst, trag sie hier ein – Gemini berücksichtigt sie bei der Analyse.</p>
+      <textarea id="partei-meinungen" placeholder="z.B. FPÖ: Kickl fordert sofortigen Stopp. ÖVP: Kogler begrüßt die Maßnahme. SPÖ: Babler kritisiert zu wenig Förderung." style="width:100%; background:var(--bg); border:1px solid var(--border2); border-radius:6px; padding:0.75rem 1rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.85rem; line-height:1.6; resize:vertical; min-height:90px; outline:none;"></textarea>
+    </div>
+
     <div style="margin-top:1rem;">
       <button class="btn" id="publish-btn" onclick="publishArtikel()">Ausgewählte Artikel analysieren & veröffentlichen</button>
       <div class="status-bar" id="publish-status">
@@ -794,7 +801,7 @@ async function publishArtikel() {
         "Content-Type": "application/json",
         "x-api-key": ADMIN_KEY
       },
-      body: JSON.stringify({ articles: ausgewaehlt })
+      body: JSON.stringify({ articles: ausgewaehlt, parteiMeinungen: document.getElementById("partei-meinungen").value.trim() || null })
     });
 
     const data = await response.json();
