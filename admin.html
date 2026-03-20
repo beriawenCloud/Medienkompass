@@ -649,10 +649,20 @@ function renderArtikel(artikel) {
   const container = document.getElementById("artikel-container");
   container.innerHTML = "";
 
+  const mediumNormMap = {
+    "orf": "ORF",
+    "der standard": "Der Standard", "standard": "Der Standard", "derstandard": "Der Standard",
+    "die presse": "Die Presse", "presse": "Die Presse",
+    "kronen zeitung": "Kronen Zeitung", "krone": "Kronen Zeitung", "kronen": "Kronen Zeitung",
+    "kurier": "Kurier",
+    "exxpress": "exxpress", "express": "exxpress",
+  };
+
   const byMedium = {};
   artikel.forEach((a, i) => {
-    if (!byMedium[a.medium]) byMedium[a.medium] = [];
-    byMedium[a.medium].push({ ...a, index: i });
+    const normMedium = mediumNormMap[a.medium?.toLowerCase()?.trim()] || a.medium;
+    if (!byMedium[normMedium]) byMedium[normMedium] = [];
+    byMedium[normMedium].push({ ...a, medium: normMedium, index: i });
   });
 
   ALLE_MEDIEN.forEach(({ medium }) => {

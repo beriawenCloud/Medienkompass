@@ -692,6 +692,15 @@ function createMediaCard(item, index) {
         <span class="media-parteien-label">Parteien:</span>
         ${item.parteien.map(p => `<span class="media-partei-badge media-partei-badge--${escapeHtml(p.sentiment || "neutral")}">${escapeHtml(p.name || "")} ${sentimentIcon(p.sentiment)}</span>`).join("")}
       </div>` : ""}
+      ${item.medienanalyse ? `
+      <div class="media-parteien" style="margin-top:0.5rem; flex-wrap:wrap; gap:0.3rem;">
+        <span class="media-parteien-label">Einordnung:</span>
+        ${item.medienanalyse.regierungshaltung ? `<span class="media-tag-badge">${escapeHtml(medienanalyseLabel('regierung', item.medienanalyse.regierungshaltung))}</span>` : ""}
+        ${item.medienanalyse.politischeAusrichtung ? `<span class="media-tag-badge">${escapeHtml(medienanalyseLabel('politik', item.medienanalyse.politischeAusrichtung))}</span>` : ""}
+        ${item.medienanalyse.wirtschaftshaltung ? `<span class="media-tag-badge">${escapeHtml(medienanalyseLabel('wirtschaft', item.medienanalyse.wirtschaftshaltung))}</span>` : ""}
+        ${item.medienanalyse.neutralitaet ? `<span class="media-tag-badge">${escapeHtml(medienanalyseLabel('neutralitaet', item.medienanalyse.neutralitaet))}</span>` : ""}
+        ${item.medienanalyse.begruendung ? `<p style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:0.3rem;width:100%;font-style:italic;">${escapeHtml(item.medienanalyse.begruendung)}</p>` : ""}
+      </div>` : ""}
     </div>
   `;
 
@@ -840,6 +849,27 @@ function sentimentIcon(sentiment) {
   if (sentiment === "positiv")  return "↑";
   if (sentiment === "negativ")  return "↓";
   return "–";
+}
+
+/* Hilfsfunktion: Labels für Medienanalyse */
+function medienanalyseLabel(typ, wert) {
+  if (typ === "regierung") {
+    const map = { "unterstuetzend": "🟢 Regierungsnah", "kritisch": "🔴 Regierungskritisch", "neutral": "⚪ Regierung neutral", "gemischt": "🟡 Regierung gemischt" };
+    return map[wert] || wert;
+  }
+  if (typ === "politik") {
+    const map = { "liberal": "Liberal", "konservativ": "Konservativ", "libertaer": "Libertär", "autoritaer": "Autoritär", "neutral": "Pol. neutral" };
+    return map[wert] || wert;
+  }
+  if (typ === "wirtschaft") {
+    const map = { "marktwirtschaftlich": "Marktwirtschaft", "sozialdemokratisch": "Sozialdemokratisch", "sozialistisch": "Sozialistisch", "neutral": "Wirtsch. neutral" };
+    return map[wert] || wert;
+  }
+  if (typ === "neutralitaet") {
+    const map = { "neutral": "✓ Neutral", "tendenzios": "⚠ Tendenziös", "einseitig": "✗ Einseitig" };
+    return map[wert] || wert;
+  }
+  return wert;
 }
 
 /* Hilfsfunktion: Political Compass Label */
