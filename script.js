@@ -1022,7 +1022,10 @@ function getMediumColor(slug) {
     "presse":   "#1a1a1a",
     "krone":    "#d4001a",
     "kurier":   "#e2001a",
-    "exxpress": "#222222"
+    "exxpress": "#222222",
+    "heute":    "#e67e22",
+    "oe24":     "#c0392b",
+    "falter":   "#7d6608"
   };
   return colors[slug] || "#6b7280";
 }
