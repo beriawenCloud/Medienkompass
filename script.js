@@ -614,7 +614,7 @@ function renderTopic(topicData, scrollToResults = true, label = "Analyse") {
   renderTopicHeader(topicData, label);
   renderMediaCards(topicData.media || []);
   renderMeaningSection(topicData);
-  renderQuestions(topicData.fragen || DEFAULT_QUESTIONS);
+  renderQuestions(topicData.offeneFragen || topicData.fragen || DEFAULT_QUESTIONS);
 }
 
 /* ---------------------------------------------------------
