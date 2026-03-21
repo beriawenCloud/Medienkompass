@@ -381,6 +381,53 @@
     .btn-sm.primary { background: var(--accent); border-color: var(--accent); color: white; }
     .btn-sm.primary:hover { background: var(--accent2); }
 
+    .paywall-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 4px;
+      padding: 0.18rem 0.5rem;
+      font-size: 0.72rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+      margin-top: 0.35rem;
+      display: inline-block;
+    }
+    .paywall-toggle-btn:hover { border-color: var(--border2); color: var(--text); }
+    .paywall-toggle-btn.active { border-color: var(--orange); color: var(--orange); }
+
+    .paywall-area {
+      margin-top: 0.4rem;
+    }
+    .paywall-textarea {
+      width: 100%;
+      min-height: 80px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 0;
+    }
+    .paywall-textarea:focus { border-color: var(--orange); }
+
+    .nur-manuell-badge {
+      font-size: 0.6rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      background: rgba(230,126,34,0.15);
+      border: 1px solid rgba(230,126,34,0.3);
+      color: var(--orange);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+
     .no-articles {
       text-align: center;
       color: var(--muted);
@@ -512,7 +559,8 @@ let ausgewaehlteArtikel = new Set();
 const MEDIUM_COLORS = {
   "ORF": "#e30613", "Der Standard": "#0e3a6e", "Die Presse": "#1a1a1a",
   "Kronen Zeitung": "#d4001a", "Krone": "#d4001a",
-  "Kurier": "#e2001a", "exxpress": "#222222", "Exxpress": "#222222"
+  "Kurier": "#e2001a", "exxpress": "#222222", "Exxpress": "#222222",
+  "heute.at": "#e67e22", "oe24.at": "#c0392b", "Falter": "#7d6608"
 };
 
 // LOGIN
@@ -643,6 +691,9 @@ const ALLE_MEDIEN = [
   { medium: "Kronen Zeitung" },
   { medium: "Kurier"         },
   { medium: "exxpress"       },
+  { medium: "heute.at",  nurManuell: true },
+  { medium: "oe24.at",   nurManuell: true },
+  { medium: "Falter",    nurManuell: true },
 ];
 
 function renderArtikel(artikel) {
@@ -656,6 +707,9 @@ function renderArtikel(artikel) {
     "kronen zeitung": "Kronen Zeitung", "krone": "Kronen Zeitung", "kronen": "Kronen Zeitung",
     "kurier": "Kurier",
     "exxpress": "exxpress", "express": "exxpress",
+    "heute.at": "heute.at", "heute": "heute.at",
+    "oe24.at": "oe24.at", "oe24": "oe24.at",
+    "falter": "Falter",
   };
 
   const byMedium = {};
@@ -665,17 +719,19 @@ function renderArtikel(artikel) {
     byMedium[normMedium].push({ ...a, medium: normMedium, index: i });
   });
 
-  ALLE_MEDIEN.forEach(({ medium }) => {
+  ALLE_MEDIEN.forEach(({ medium, nurManuell }) => {
     const items = byMedium[medium] || [];
     const color = MEDIUM_COLORS[medium] || "#666";
 
     const section = document.createElement("div");
     section.className = "medium-section";
     section.dataset.medium = medium;
+    const nurManuellBadge = nurManuell ? `<span class="nur-manuell-badge">nur manuell</span>` : "";
     section.innerHTML = `
       <div class="medium-label" style="justify-content:space-between;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="medium-badge" style="background:${color};">${escapeHtml(medium)}</span>
+          ${nurManuellBadge}
           <span>${items.length} Artikel</span>
         </div>
         <button class="btn-sm" id="addbtn-${medium.replace(/\s+/g,'-')}" onclick="toggleManualForm('${medium.replace(/'/g,"\\'").replace(/\s+/g,'-')}')">+ Hinzufügen</button>
@@ -689,7 +745,7 @@ function renderArtikel(artikel) {
         <p class="manual-err" style="color:var(--accent2);font-size:0.78rem;margin-top:0.4rem;display:none;"></p>
       </div>
       <div class="artikel-grid" id="grid-${medium.replace(/\s+/g,'-')}">
-        ${items.length === 0 ? `<div class="no-articles-hint" style="color:var(--muted);font-size:0.82rem;padding:0.5rem 0;">Keine Artikel gefunden</div>` : ""}
+        ${items.length === 0 ? `<div class="no-articles-hint" style="color:var(--muted);font-size:0.82rem;padding:0.5rem 0;">${nurManuell ? "Manuell hinzufügen ↑" : "Keine Artikel gefunden"}</div>` : ""}
       </div>
     `;
     container.appendChild(section);
@@ -713,6 +769,10 @@ function createArtikelItem(index, a) {
       <div class="artikel-title">${escapeHtml(a.title || a.link)}</div>
       <div class="artikel-meta">${a.manuell ? "Manuell hinzugefügt" : formatDate(a.pubDate)}</div>
       <a class="artikel-link" href="${escapeHtml(a.link)}" target="_blank" onclick="event.stopPropagation();">${escapeHtml(a.link)}</a>
+      <button class="paywall-toggle-btn" id="paywall-btn-${index}" onclick="togglePaywallArea(${index}, event)">📄 Paywall-Text einfügen</button>
+      <div class="paywall-area" id="paywall-area-${index}" style="display:none;">
+        <textarea class="paywall-textarea" placeholder="Artikel-Text hier einfügen – Gemini analysiert diesen statt die URL zu fetchen. Link bleibt für die Verlinkung erhalten." oninput="updatePaywallText(${index}, this.value)" onclick="event.stopPropagation()"></textarea>
+      </div>
     </div>
   `;
   item.addEventListener("click", () => toggleArtikel(index, item));
@@ -722,6 +782,24 @@ function createArtikelItem(index, a) {
 function toggleManualForm(mediumId) {
   const form = document.getElementById("form-" + mediumId);
   if (form) form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+function togglePaywallArea(index, event) {
+  event.stopPropagation();
+  const area = document.getElementById("paywall-area-" + index);
+  const btn  = document.getElementById("paywall-btn-" + index);
+  if (!area) return;
+  const isHidden = area.style.display === "none";
+  area.style.display = isHidden ? "block" : "none";
+  btn.textContent = isHidden ? "📄 Text ausblenden" : "📄 Paywall-Text einfügen";
+  btn.classList.toggle("active", isHidden);
+  if (isHidden) area.querySelector("textarea").focus();
+}
+
+function updatePaywallText(index, value) {
+  if (alleArtikel[index] !== undefined) {
+    alleArtikel[index].paywallText = value.trim() || null;
+  }
 }
 
 function addManualForMedium(mediumId, medium, btn) {
