@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="10;url=https://medienkompass.gallaktisch.org">
+  <title>Medienkompass – Wir sind umgezogen!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --paper: #f5f0e8;
+      --accent: #c0392b;
+      --gold: #d4a017;
+      --muted: #7a7a7a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Source Sans 3', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Zeitungspapier Textur */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent: 28px,
+          rgba(0,0,0,0.03) 28px,
+          rgba(0,0,0,0.03) 29px
+        );
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      width: 90%;
+      text-align: center;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dateline {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    .divider {
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--ink), transparent);
+      margin: 0.75rem 0;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .divider-thin {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--muted), transparent);
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin: 0.75rem 0;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .kicker {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      animation: fadeUp 0.8s 0.25s ease both;
+    }
+
+    .lead {
+      font-size: 1.15rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: #3a3a3a;
+      margin: 1.2rem 0 2rem;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+
+    .new-address {
+      background: var(--ink);
+      color: var(--paper);
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      position: relative;
+      margin: 0.5rem 0 1.5rem;
+      transition: all 0.2s ease;
+      animation: fadeUp 0.8s 0.5s ease both;
+    }
+
+    .new-address::before,
+    .new-address::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border: 1px solid var(--ink);
+      transition: inset 0.2s ease;
+    }
+
+    .new-address:hover {
+      background: var(--accent);
+    }
+
+    .new-address:hover::before,
+    .new-address:hover::after {
+      inset: -6px;
+    }
+
+    .countdown {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 1rem;
+      animation: fadeUp 0.8s 0.6s ease both;
+    }
+
+    .countdown span {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    .footer-rule {
+      margin-top: 2.5rem;
+      animation: fadeUp 0.8s 0.7s ease both;
+    }
+
+    .footer-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.75rem;
+    }
+
+    /* Dekorative Ecken */
+    .corner {
+      position: fixed;
+      width: 60px;
+      height: 60px;
+      opacity: 0.15;
+    }
+    .corner--tl { top: 20px; left: 20px; border-top: 2px solid var(--ink); border-left: 2px solid var(--ink); }
+    .corner--tr { top: 20px; right: 20px; border-top: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+    .corner--bl { bottom: 20px; left: 20px; border-bottom: 2px solid var(--ink); border-left: 2px solid var(--ink); }
+    .corner--br { bottom: 20px; right: 20px; border-bottom: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+  </style>
+</head>
+<body>
+
+  <div class="corner corner--tl"></div>
+  <div class="corner corner--tr"></div>
+  <div class="corner corner--bl"></div>
+  <div class="corner corner--br"></div>
+
+  <div class="container">
+    <p class="dateline">Medienkompass Österreich &nbsp;·&nbsp; Wichtige Mitteilung</p>
+    <div class="divider"></div>
+    <p class="kicker">Neue Adresse</p>
+    <h1>Wir sind<br>umgezogen!</h1>
+    <div class="divider divider-thin"></div>
+
+    <p class="lead">
+      Der Medienkompass hat ein neues Zuhause gefunden.<br>
+      Ab sofort findet ihr den täglichen österreichischen<br>
+      Medienvergleich unter unserer neuen Adresse:
+    </p>
+
+    <a href="https://medienkompass.gallaktisch.org" class="new-address">
+      medienkompass.gallaktisch.org
+    </a>
+
+    <p class="countdown">
+      Automatische Weiterleitung in <span id="timer">10</span> Sekunden …
+    </p>
+
+    <div class="footer-rule">
+      <div class="divider"></div>
+      <p class="footer-text">Diese Seite wird nicht mehr aktualisiert</p>
+    </div>
+  </div>
+
+  <script>
+    let seconds = 10;
+    const timerEl = document.getElementById('timer');
+    const interval = setInterval(() => {
+      seconds--;
+      timerEl.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(interval);
+        window.location.href = 'https://medienkompass.gallaktisch.org';
+      }
+    }, 1000);
+  </script>
+
+</body>
+</html>
